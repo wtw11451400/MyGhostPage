@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>他的专属玩具 - 病娇恋爱互动</title>
+    <title>他的专属玩具 · 病娇恋爱互动</title>
     <style>
         * {
             margin: 0;
@@ -11,347 +11,544 @@
             box-sizing: border-box;
         }
         body {
-            background: #1a0a0a;
+            background: #120808;
             color: #eee;
             font-family: "Microsoft YaHei", sans-serif;
-            line-height: 1.8;
+            line-height: 1.9;
             min-height: 100vh;
+            transition: all 0.8s ease;
+            padding: 20px;
+        }
+        /* 开场动画遮罩 */
+        #startLoader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            z-index: 9999;
+            transition: opacity 1.2s ease, transform 1.2s ease;
         }
+        .loader-text {
+            color: #ff5555;
+            font-size: 26px;
+            letter-spacing: 6px;
+            animation: breath 2s infinite ease-in-out;
+        }
+        @keyframes breath {
+            0%,100% {opacity:0.4; transform: scale(1);}
+            50% {opacity:1; transform: scale(1.05);}
+        }
+        .fade-out {
+            opacity: 0 !important;
+            pointer-events: none;
+            transform: scale(1.1);
+        }
+        /* 主容器 */
         .game-container {
-            max-width: 600px;
+            max-width: 620px;
             width: 100%;
-            background: #111;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 0 30px rgba(200, 0, 0, 0.5);
-            border: 1px solid #440000;
+            margin: 0 auto;
+            background: #140a0a;
+            padding: 35px 25px;
+            border-radius: 14px;
+            box-shadow: 0 0 40px rgba(180,0,0,0.45);
+            border: 1px solid #551111;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 1s ease, transform 1s ease;
+        }
+        .show-container {
+            opacity: 1;
+            transform: translateY(0);
         }
         .scene-title {
-            color: #ff6666;
+            color: #ff6060;
             font-size: 24px;
-            margin-bottom: 20px;
+            margin-bottom: 22px;
             text-align: center;
-            text-shadow: 0 0 10px rgba(255, 100, 100, 0.5);
+            text-shadow: 0 0 12px rgba(255,80,80,0.6);
+            opacity: 0;
+            transition: opacity 0.7s ease;
         }
+        .scene-title.show {opacity:1;}
         .scene-text {
-            margin-bottom: 30px;
+            margin-bottom: 35px;
             font-size: 16px;
-            min-height: 150px;
+            min-height: 200px;
+            opacity: 0;
+            transition: opacity 0.8s ease;
         }
+        .scene-text.show {opacity:1;}
+        .choices {
+            opacity: 0;
+            transition: opacity 0.9s ease;
+        }
+        .choices.show {opacity:1;}
         .choice-btn {
             display: block;
             width: 100%;
-            padding: 15px;
-            margin: 10px 0;
-            background: #221111;
+            padding: 16px;
+            margin: 12px 0;
+            background: #251212;
             color: #ddd;
-            border: 1px solid #442222;
-            border-radius: 5px;
+            border: 1px solid #4a2222;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 16px;
-            transition: all 0.3s;
+            font-size: 15px;
+            transition: all 0.4s ease;
         }
         .choice-btn:hover {
-            background: #331a1a;
+            background: #3a1a1a;
             border-color: #ff6666;
-            color: #ff6666;
+            color: #ff7777;
+            letter-spacing: 1px;
         }
         .end-btn {
-            background: #ff4444;
-            border-color: #ff4444;
+            background: #bb2222;
+            border-color: #dd3333;
             color: #fff;
         }
         .end-btn:hover {
-            background: #ff6666;
+            background: #dd3333;
         }
+        /* 场景氛围变色 */
+        .mood-normal {background:#120808;}
+        .mood-dark {background:#0b0505;}
+        .mood-nervous {background:#1a0909;}
+        .mood-mad {background:#1f0606;}
+        .mood-sad {background:#0e0707;}
     </style>
 </head>
-<body>
-    <div class="game-container">
-        <h1 class="scene-title" id="title">他的专属玩具</h1>
-        <p class="scene-text" id="text">你在学校图书馆遇到了他，那个传说中又温柔又帅气的学长。他主动和你搭话，笑容干净又好看，你心动了。这是你们认识的第一天，你会怎么回应？</p>
-        <div class="choices" id="choices">
-            <button class="choice-btn" onclick="goToScene('accept')">笑着回应，和他交换了联系方式</button>
-            <button class="choice-btn" onclick="goToScene('decline')">有点害羞，婉拒了他的搭话</button>
-        </div>
+<body id="bodyBg">
+    <!-- 开场动画 -->
+    <div id="startLoader">
+        <div class="loader-text">正在坠入他的温柔牢笼...</div>
+    </div>
+
+    <div class="game-container" id="gameBox">
+        <h1 class="scene-title" id="title"></h1>
+        <p class="scene-text" id="text"></p>
+        <div class="choices" id="choices"></div>
     </div>
 
     <script>
+        // 全部完善剧情+多分支+情景氛围绑定
         const scenes = {
             start: {
-                title: "他的专属玩具",
-                text: "你在学校图书馆遇到了他，那个传说中又温柔又帅气的学长。他主动和你搭话，笑容干净又好看，你心动了。这是你们认识的第一天，你会怎么回应？",
+                title: "序章 · 图书馆的初遇",
+                text: "午后的图书馆光线昏暗，落叶透过窗棂落在书页上。你低头翻书时，一道干净温柔的身影停在你桌旁。少年眉眼清俊，笑容浅浅，像藏着无尽温柔，又藏着你看不懂的幽深。他主动开口搭话，目光牢牢落在你身上，一刻也没有移开。你心头微颤，不知该如何回应这份突如其来的靠近。",
+                mood: "mood-normal",
                 choices: [
-                    { text: "笑着回应，和他交换了联系方式", next: "accept" },
-                    { text: "有点害羞，婉拒了他的搭话", next: "decline" }
+                    { text: "轻声回应，顺其自然交换联系方式", next: "accept" },
+                    { text: "略显羞涩，委婉避开他的搭话", next: "decline" }
                 ]
             },
             accept: {
-                title: "温柔的开始",
-                text: "他的聊天消息秒回，每天都和你分享日常，还会给你送早餐、接你下课。身边的朋友都说他对你太好了，像小说里的男主角。你沉浸在这种被偏爱里，完全没注意到他看你的眼神，越来越深，越来越偏执。",
+                title: "第一章 · 温柔的圈套",
+                text: "你笑着回应了他，两人顺其自然加了联系方式。从那天起，他早安晚安从不缺席，记住你所有喜好，清楚你下课时间、常去的奶茶店、甚至你随口一提的小习惯。所有人都羡慕你被这样温柔的学长偏爱，可只有暗处的细节在悄悄暴露——他翻看你社交主页的每条动态，默默记下你身边每一个异性，眼底藏着不易察觉的占有欲，像在慢慢圈住属于自己的猎物。",
+                mood: "mood-normal",
                 choices: [
-                    { text: "答应他的表白，和他在一起", next: "together" },
-                    { text: "觉得发展太快，想再了解一下", next: "slow" }
+                    { text: "被温柔打动，答应他的告白", next: "together" },
+                    { text: "警惕发展太快，想再慢慢了解", next: "slow" },
+                    { text: "只想维持普通朋友界限", next: "friendZone" }
                 ]
             },
             decline: {
-                title: "婉拒之后",
-                text: "你婉拒了他，转身离开时，没看到他脸上的笑容瞬间消失，眼神冰冷地盯着你的背影。从那天起，你总感觉有人在跟着你，书包里偶尔会出现陌生的纸条，写着你的名字，还有一句‘别想跑’。",
+                title: "第一章 · 躲避后的窥视",
+                text: "你羞涩婉拒了他的搭话，转身快步离开图书馆。你没有看见，身后少年脸上的温柔笑意瞬间敛去，眼神骤然变冷，牢牢锁住你的背影。从这天开始，一种被人暗中注视的感觉如影随形。路上总有巧合的偶遇，书包里莫名出现带着字迹的纸条，上面只有一句冰冷的低语：别想躲开我。空气渐渐变得压抑，你开始莫名心慌。",
+                mood: "mood-nervous",
                 choices: [
-                    { text: "告诉老师，怀疑被人跟踪", next: "teacher" },
-                    { text: "有点害怕，不敢声张，躲着走", next: "hide" }
+                    { text: "心生不安，向老师反映被跟踪感", next: "teacher" },
+                    { text: "害怕惹事，只能刻意绕路躲避", next: "hide" },
+                    { text: "鼓起勇气，当面质问他为何紧盯自己", next: "confront" }
                 ]
             },
             together: {
-                title: "成为他的女朋友",
-                text: "你们在一起了，他对你的好变本加厉，也开始管你的一切：不许和异性说话，不许单独出门，手机要随时给他看。你一开始觉得是在乎，直到他翻出你和男闺蜜的聊天记录，第一次对你发了火。",
+                title: "第二章 · 恋人的枷锁",
+                text: "你答应和他在一起，起初是被无微不至的温柔包裹。可恋爱没多久，他的控制欲开始肆无忌惮爆发：不准你和异性多说一句话，不准独自外出，手机聊天记录要随时给他检查。一旦你稍有反抗，他就会委屈示弱，把所有错都归于你不够在乎他。直到撞见你和异性好友正常聊天，他第一次彻底失控，眼底翻涌着偏执与怒意，温柔外壳碎裂殆尽。",
+                mood: "mood-dark",
                 choices: [
-                    { text: "和男闺蜜断联，哄他开心", next: "cutFriend" },
-                    { text: "觉得他管得太宽，和他吵架", next: "fight" }
+                    { text: "妥协删好友，迁就他的占有欲", next: "cutFriend" },
+                    { text: "无法接受控制，当场和他争执", next: "fight" },
+                    { text: "表面顺从，私下悄悄和朋友联络", next: "secretContact" }
                 ]
             },
             slow: {
-                title: "再了解一下",
-                text: "你说想再了解一下，他脸上的笑容僵了一下，很快又恢复温柔，说没关系，会等你。但从那天起，他开始出现在你所有的地方：你上课的教室、兼职的奶茶店、甚至你家楼下。",
+                title: "第二章 · 拖延换来的紧盯",
+                text: "你表示想再多了解一段时间，他依旧温柔点头，可眼底掠过一丝不易察觉的阴翳。此后他不再给你留白，强行渗入你生活的每一处：上课堵教室、兼职等门口、傍晚跟在你回家的路上。他从不越界过分，却用无处不在的存在感，让你永远逃不开他的视线，慢慢被无形的网困住，连呼吸都觉得受限。",
+                mood: "mood-nervous",
                 choices: [
-                    { text: "被他的坚持打动，答应和他在一起", next: "together" },
-                    { text: "感觉被监视，开始疏远他", next: "distance" }
+                    { text: "被执着打动，最终答应交往", next: "together" },
+                    { text: "察觉被监视，刻意冷淡疏远", next: "distance" },
+                    { text: "刻意冷漠敷衍，想让他知难而退", next: "coldShoulder" }
+                ]
+            },
+            friendZone: {
+                title: "第二章 · 朋友只是借口",
+                text: "你只想保持普通朋友距离，他嘴上答应，行动却从未收敛。他以朋友名义干涉你的穿搭、社交、作息，旁人都误以为你们是情侣，他也从不解释，只是含笑看着你无法辩解。你渐渐发现，在他眼里，从来没有「普通朋友」这个选项，只要被他盯上，就注定只能属于他一人。",
+                mood: "mood-dark",
+                choices: [
+                    { text: "直白摊牌，拒绝被过度干涉", next: "confess" },
+                    { text: "习惯他的照顾，默认暧昧关系", next: "together" },
+                    { text: "刻意减少见面，慢慢抽离距离", next: "distance" }
                 ]
             },
             teacher: {
-                title: "告诉老师",
-                text: "你把被跟踪的事告诉了老师，学校找他谈话，他否认了一切，还反过来对你嘘寒问暖，说担心你被坏人骚扰。老师信了他的话，反而劝你别多想。你这才发现，他早就把自己塑造成了关心你的学长形象。",
+                title: "第三章 · 无人相信的不安",
+                text: "你鼓起勇气把被跟踪、被窥视的感受告诉老师，可他早已提前塑造了温柔懂事的人设。面对老师询问，他言辞恳切，只说是好心关心同学，反倒显得你敏感多想。老师劝慰你别胡思乱想，同学也觉得你太过矫情。一瞬间，你陷入孤立无援，连可以倾诉的人都没有，不安愈发浓重。",
+                mood: "mood-sad",
                 choices: [
-                    { text: "意识到危险，立刻报警", next: "police" },
-                    { text: "害怕他报复，不敢再提", next: "silent" }
+                    { text: "认清现实风险，选择直接报警", next: "police" },
+                    { text: "害怕被报复，选择沉默隐忍", next: "silent" },
+                    { text: "找信赖好友结伴，互相照应", next: "friendHelp" }
                 ]
             },
             hide: {
-                title: "躲着走",
-                text: "你开始绕路走，可无论你走哪条路，总能遇到他。他会笑着说‘好巧啊’，但你看到他口袋里露出的、和纸条上一样的字迹。你越来越害怕，晚上不敢出门，手机不敢开机。",
+                title: "第三章 · 无处可躲的阴影",
+                text: "你开始刻意绕路、提前出门、避开人少的小路，可无论怎么换路线，总能「偶遇」他。他永远带着温和笑意，仿佛一切都是巧合，可你清楚感受到那刻意的尾随与窥视。夜里躺在床上，总觉得窗外有视线落在身上，失眠、心慌、恐惧，慢慢缠上你的生活。",
+                mood: "mood-nervous",
                 choices: [
-                    { text: "鼓起勇气问他为什么跟着自己", next: "confront" },
-                    { text: "请假回家，再也不来学校", next: "escapeHome" }
+                    { text: "不再忍耐，当面问清他的目的", next: "confront" },
+                    { text: "身心俱疲，请假回家躲避", next: "escapeHome" },
+                    { text: "躲在学校僻静角落，暂时避人", next: "hidePlace" }
                 ]
             },
             cutFriend: {
-                title: "为他断联",
-                text: "你删掉了男闺蜜，他终于消了气，抱着你说‘这样才乖’。但这只是开始，他开始管你的穿着，不让你穿裙子，不让你和女生出去玩，甚至把你手机里所有异性的联系方式都删光了。",
+                title: "第三章 · 妥协只是开始",
+                text: "你为了安抚他，删掉异性好友联系方式。他瞬间恢复温柔，抱着你柔声夸赞你懂事。可这只是退让的开端，他开始一步步剥夺你的社交：限制同性朋友来往、管控穿衣风格、查看手机每一条消息。你渐渐失去自己的圈子、爱好、自由，生活里只剩下他一人，像被圈养在牢笼里的玩偶。",
+                mood: "mood-dark",
                 choices: [
-                    { text: "继续妥协，怕他生气", next: "compromise" },
-                    { text: "忍无可忍，提出分手", next: "breakup" }
+                    { text: "继续妥协退让，避免他发怒", next: "compromise" },
+                    { text: "忍到极限，决绝提出分手", next: "breakup" },
+                    { text: "偷偷恢复联络，小心翼翼隐瞒", next: "secretContact" }
                 ]
             },
             fight: {
-                title: "和他吵架",
-                text: "你和他吵了起来，说他控制欲太强。他第一次对你发了很大的火，摔了你的杯子，说‘我都是为了你好，你只能是我的’。你被吓到了，第一次觉得他陌生又可怕。",
+                title: "第三章 · 撕破温柔假象",
+                text: "你忍不住和他争吵，控诉他控制欲太强、不给你私人空间。他第一次彻底失控，摔碎桌上水杯，眼底翻涌偏执与戾气，嘶吼着你只能属于他，不许任何人觊觎。发泄过后，他又立刻示弱落泪，哀求你不要离开，用温柔和愧疚捆绑你的情绪，让你愧疚、犹豫、无法彻底抽身。",
+                mood: "mood-mad",
                 choices: [
-                    { text: "服软道歉，不敢再和他吵", next: "compromise" },
-                    { text: "坚定地提出分手，说受不了他", next: "breakup" }
+                    { text: "害怕冲突，低头服软妥协", next: "compromise" },
+                    { text: "心冷彻底，坚持分手决裂", next: "breakup" },
+                    { text: "选择冷战，看他是否会收敛", next: "coldWar" }
+                ]
+            },
+            secretContact: {
+                title: "第四章 · 隐瞒被拆穿",
+                text: "你私下偷偷和旧朋友联络，小心翼翼不敢让他发现。可他早已在你手机暗中装了监控，你的每一条消息、每一次聊天都被他尽收眼底。被拆穿那一刻，他笑容冰冷，眼神透着受伤与疯狂，把你锁在房间没收手机，语气低沉：你为什么总要骗我？难道我给你的还不够多吗？",
+                mood: "mood-mad",
+                choices: [
+                    { text: "示弱哭泣，哀求他原谅", next: "compromise" },
+                    { text: "趁他不备，伺机逃跑", next: "runAway" },
+                    { text: "彻底摊牌，坚定要结束关系", next: "breakup" }
+                ]
+            },
+            coldShoulder: {
+                title: "第四章 · 冷漠只会激化偏执",
+                text: "你刻意冷淡、不回消息、避开见面，想让他主动放弃。可你的疏离非但没有劝退，反而点燃了他的占有欲。他开始堵在你宿舍楼下、家门口，红着眼眶质问你为何刻意躲开，语气带着委屈，又藏着不容拒绝的强势：你越躲，我越不可能放手。",
+                mood: "mood-nervous",
+                choices: [
+                    { text: "被他偏执震慑，勉强答应交往", next: "together" },
+                    { text: "态度强硬，明确拒绝他的纠缠", next: "refuse" },
+                    { text: "假意缓和，暗中寻找脱身机会", next: "pretendRelax" }
                 ]
             },
             distance: {
-                title: "开始疏远",
-                text: "你开始不回他的消息，不接他的电话，他却变本加厉地出现在你面前。他堵在你家门口，红着眼睛问你‘为什么不理我’，语气里的偏执让你浑身发冷。",
+                title: "第四章 · 逃离无效",
+                text: "你刻意疏远、减少回应，试图慢慢淡出他的世界。可他像附骨之疽，你退一步，他进十步。总能精准出现在你必经的每一个地方，温柔言语下是强势的禁锢，让你明白：只要被他盯上，简单的疏远根本没用。",
+                mood: "mood-dark",
                 choices: [
-                    { text: "被他吓到，答应和他试试", next: "together" },
-                    { text: "态度坚决，说不想和他有牵扯", next: "refuse" }
+                    { text: "被逼无奈，只能答应在一起", next: "together" },
+                    { text: "立场坚定，彻底划清界限", next: "refuse" },
+                    { text: "以忙碌为借口，暂时避开见面", next: "busy" }
+                ]
+            },
+            confess: {
+                title: "第四章 · 摊牌毫无用处",
+                text: "你认真和他摊牌，不愿被过度掌控、不愿做依附他的存在。他听完只是淡淡一笑，丝毫没有收敛的意思，反而觉得你在意他、在乎他的态度，更加激起他的掌控欲。从这天起，他管束更严、窥视更密，温柔变成困住你的枷锁。",
+                mood: "mood-mad",
+                choices: [
+                    { text: "彻底失望，拉黑所有联系方式", next: "refuse" },
+                    { text: "无力反抗，只能默默妥协", next: "compromise" },
+                    { text: "求助师长家长，强制介入分开", next: "police" }
                 ]
             },
             police: {
-                title: "报警",
-                text: "你报了警，可他没有做出实质伤害，警察只能口头警告。从派出所出来的那天，他第一次露出了真面目，眼神冰冷地看着你，说‘你惹火我了’。",
+                title: "第五章 · 法律也难约束的偏执",
+                text: "你选择报警，可他没有实质伤害行为，警方只能口头警告。这次警告彻底惹怒了他，温柔面具完全撕碎，眼神冰冷阴郁。他开始暗中威胁你的朋友、家人，用身边人的安稳逼迫你妥协，让你明白他偏执起来，什么事情都做得出来。",
+                mood: "mood-mad",
                 choices: [
-                    { text: "申请学校保护，搬去宿舍住", next: "protect" },
-                    { text: "收拾东西，立刻离开这座城市", next: "escapeCity" }
+                    { text: "申请学校庇护，搬入宿舍避嫌", next: "protect" },
+                    { text: "连夜收拾行李，逃离这座城市", next: "escapeCity" },
+                    { text: "假意顺从放松他警惕，暗中取证", next: "pretendRelax" }
                 ]
             },
             silent: {
-                title: "不敢再提",
-                text: "你不敢再提，只能任由他出现在你生活里。他开始以‘保护你’为由，接送你上下课，甚至跟着你去兼职。身边的人都以为你们是情侣，只有你知道，这是一场无止境的监视。",
+                title: "第五章 · 沉默换来变本加厉",
+                text: "你选择沉默隐忍，不敢反抗、不敢求助。你的退让在他眼里变成默认与接受，他愈发肆无忌惮，光明正大接送你、干涉你生活，在外人面前扮演深情追求者，把你困在无形的舆论与视线里，孤立无援，步步沦陷。",
+                mood: "mood-sad",
                 choices: [
-                    { text: "试着接受他，说不定他只是太在乎", next: "together" },
-                    { text: "找机会偷偷转学，离开这里", next: "transfer" }
+                    { text: "认命试着接受他的存在", next: "together" },
+                    { text: "悄悄准备转学，彻底远离", next: "transfer" },
+                    { text: "向他好友倾诉，希望有人劝导", next: "tellFriend" }
+                ]
+            },
+            friendHelp: {
+                title: "第五章 · 朋友也无法依靠",
+                text: "你找来好友结伴同行，想借此避开他的尾随。可他太擅长伪装，在你朋友面前温柔克制，反倒把你塑造成敏感多想的一方。朋友纷纷劝你别太过较真，觉得他只是太过深情。你彻底陷入孤独，连身边人都无法理解你的恐惧。",
+                mood: "mood-sad",
+                choices: [
+                    { text: "放弃求助，只能独自躲避", next: "hide" },
+                    { text: "不再侥幸，果断报警取证", next: "police" },
+                    { text: "假意和好，悄悄收集他纠缠证据", next: "pretendRelax" }
                 ]
             },
             confront: {
-                title: "当面质问",
-                text: "你拦住他，问他为什么一直跟着你。他笑着承认了，说‘因为我喜欢你啊，我要看着你，不让别人抢走’。他的笑容依旧温柔，可眼神里的疯狂让你不寒而栗。",
+                title: "第五章 · 质问只会坦诚偏执",
+                text: "你拦住他当面质问为何一直尾随窥视。他没有否认，反而坦然承认喜欢你到无法自控，眼神偏执又认真：我想看着你、守着你，我不能接受你身边有别人。温柔的语气里，是不容挣脱的占有，让你浑身发冷，真切感受到他骨子里的疯狂。",
+                mood: "mood-nervous",
                 choices: [
-                    { text: "被他的偏执吓到，答应和他在一起", next: "together" },
-                    { text: "明确拒绝，说不喜欢他这样", next: "refuse" }
+                    { text: "被偏执震慑，不敢再拒绝", next: "together" },
+                    { text: "立场坚定，明确拒绝他", next: "refuse" },
+                    { text: "假装被打动，趁机脱身", next: "pretendRelax" }
                 ]
             },
             escapeHome: {
-                title: "回家躲避",
-                text: "你请假回了家，以为能躲开他。可没过几天，你家门口出现了他的身影，他说‘我找到你了’。你才发现，他早就知道你家的地址，甚至比你自己还了解你的一切。",
+                title: "第六章 · 回家也躲不开",
+                text: "你请假回到家中，以为远离学校就能躲开纠缠。可没过几天，他就出现在你家小区楼下，安静伫立，目光望向你家窗户。你瞬间头皮发麻——他早就摸清你的家庭住址、作息行踪，你逃到哪里，他就能找到哪里。",
+                mood: "mood-nervous",
                 choices: [
-                    { text: "让父母出面赶走他", next: "parents" },
-                    { text: "假装妥协，骗他离开", next: "pretend" }
+                    { text: "让父母出面驱赶并警告", next: "parents" },
+                    { text: "假意答应他，骗他先行离开", next: "pretend" },
+                    { text: "和家人商议，连夜搬家远离", next: "escapeCity" }
+                ]
+            },
+            hidePlace: {
+                title: "第六章 · 躲藏毫无意义",
+                text: "你躲进学校僻静的杂物间，以为能暂时避开视线。可没多久，门被轻轻推开，他缓步走入，眼底带着笃定的笑意。他早就猜到你的藏身之处，对你的一举一动了如指掌。狭小的空间里，只有你慌乱的心跳和他步步靠近的身影。",
+                mood: "mood-dark",
+                choices: [
+                    { text: "无力挣脱，只能任由他带走", next: "together" },
+                    { text: "趁他靠近，拼命冲出去逃跑", next: "runAway" },
+                    { text: "示弱哀求，求他放过自己", next: "beg" }
                 ]
             },
             compromise: {
-                title: "不断妥协",
-                text: "你一次次妥协，失去了朋友，失去了爱好，甚至失去了和家人联系的自由。你被困在他的世界里，像他的专属玩具。他对你越来越温柔，也越来越偏执，连你看别人一眼都会生气。",
+                title: "第六章 · 沦为专属玩偶",
+                text: "你一次次妥协、退让、迁就，慢慢丢掉自我。社交、爱好、私人空间全部被剥夺，生活围着他转，情绪由他掌控。他对你温柔依旧，却带着牢牢的禁锢，把你养成只依赖他、只属于他的人偶，再也没有逃离的勇气与能力。",
+                mood: "mood-dark",
                 choices: [
-                    { text: "彻底放弃反抗，接受现状", next: "endObedient" },
-                    { text: "趁他不注意，偷偷逃跑", next: "runAway" }
+                    { text: "彻底放弃反抗，接受宿命", next: "endObedient" },
+                    { text: "暗中等待时机，伺机逃离", next: "runAway" },
+                    { text: "故意激怒他，留存施暴证据", next: "provoke" }
                 ]
             },
             breakup: {
-                title: "提出分手",
-                text: "你说要分手，他愣住了，然后突然笑了，说‘分手？你想跑到哪里去？’他把你锁在房间里，第一次对你动手，说‘你哪里也别想去，只能留在我身边’。",
+                title: "第六章 · 分手触发疯狂",
+                text: "你坚决提出分手，彻底打碎他的掌控幻想。他瞬间褪去所有温柔，眼神阴鸷偏执，把你锁在房间，语气低沉冰冷：分手？你以为你有选择的权利吗？从遇见你的那一刻起，你就注定只能留在我身边，哪也去不了。",
+                mood: "mood-mad",
                 choices: [
-                    { text: "害怕得哭着道歉，求他原谅", next: "compromise" },
-                    { text: "趁他不备，砸晕他逃出去", next: "escapeRoom" }
+                    { text: "恐惧之下道歉求和", next: "compromise" },
+                    { text: "寻机反击，砸晕他逃离", next: "escapeRoom" },
+                    { text: "假意服软，暗中等待求救机会", next: "pretendRelax" }
+                ]
+            },
+            coldWar: {
+                title: "第七章 · 冷战只会加深监视",
+                text: "你选择冷战不理会他，本想让他冷静反思。可他却用更极端的方式回应：暗中监控你手机、跟踪你出行、盘问你每一个接触的人。冷战在他眼里，只是你想要逃离的借口，只会让他看管更严、控制更强。",
+                mood: "mood-dark",
+                choices: [
+                    { text: "服软和好，不敢再冷战", next: "compromise" },
+                    { text: "心死决绝，坚持分手", next: "breakup" },
+                    { text: "假意缓和，悄悄卸载监控", next: "pretendRelax" }
+                ]
+            },
+            pretendRelax: {
+                title: "第七章 · 假意顺从暗中布局",
+                text: "你刻意收敛态度，对他温柔平和，让他放下警惕。暗地里悄悄录音、保存聊天记录、拍下他尾随与威胁的证据。你清楚，唯有拿到足够凭证，才能真正摆脱这份偏执的纠缠，逃出他布下的牢笼。",
+                mood: "mood-normal",
+                choices: [
+                    { text: "证据充足，立刻报警求助", next: "police" },
+                    { text: "继续隐忍，收集更多关键证据", next: "collectMore" },
+                    { text: "趁他放松，直接远走他乡", next: "escapeCity" }
                 ]
             },
             refuse: {
-                title: "明确拒绝",
-                text: "你明确拒绝了他，说不喜欢他这样。他的笑容消失了，眼神冰冷地说‘没关系，我会让你喜欢上我的，用我的方式’。从那天起，他的跟踪和骚扰变本加厉，甚至开始威胁你的家人。",
+                title: "第七章 · 拒绝换来威胁",
+                text: "你态度坚决彻底拒绝他的所有靠近与纠缠。他脸上温柔彻底消失，只剩阴冷偏执：你可以拒绝我，但你逃不掉。此后他开始暗中威胁你的亲友，用身边人的安稳逼迫你妥协，告诉你反抗只会付出更大代价。",
+                mood: "mood-mad",
                 choices: [
-                    { text: "为了保护家人，答应和他在一起", next: "together" },
-                    { text: "立刻搬家，换手机号消失", next: "escapeCity" }
+                    { text: "为保护亲友，被迫妥协接受", next: "together" },
+                    { text: "斩断一切，换城市换手机号消失", next: "escapeCity" },
+                    { text: "联系他家人，曝光他偏执行为", next: "tellFamily" }
+                ]
+            },
+            busy: {
+                title: "第七章 · 忙碌挡不住靠近",
+                text: "你以学业忙碌、兼职繁忙为借口减少见面。可他从不给你疏远的机会，以关心为名送三餐、等下班、守在你必经路口，用无休止的陪伴填满你的生活，让你连独处喘息的空间都没有。",
+                mood: "mood-nervous",
+                choices: [
+                    { text: "被坚持打动，试着接受他", next: "together" },
+                    { text: "彻底厌烦，直接拉黑断绝", next: "refuse" },
+                    { text: "找好友假扮男友，让他死心", next: "fakeBoyfriend" }
                 ]
             },
             protect: {
-                title: "学校保护",
-                text: "学校安排了老师保护你，可他总能找到机会接近你。他在你宿舍楼下等你，给你送带血的玫瑰，说‘你越反抗，我越想要你’。你被吓得精神恍惚，连课都不敢去上。",
+                title: "第八章 · 庇护也挡不住阴影",
+                text: "学校给你安排庇护与陪同，可他总能找到空隙靠近。深夜宿舍楼下的等待、带着诡异气息的礼物、眼神里直白的占有欲，让你精神紧绷、夜夜难安。庇护只能护住人身，却挡不住无处不在的心理恐惧。",
+                mood: "mood-sad",
                 choices: [
-                    { text: "申请休学，回家躲着", next: "escapeHome" },
-                    { text: "联合朋友设计，让他出丑", next: "trap" }
+                    { text: "申请休学，回家静养躲避", next: "escapeHome" },
+                    { text: "联合朋友设局，曝光他所作所为", next: "trap" },
+                    { text: "向法院申请人身保护", next: "police" }
                 ]
             },
             escapeCity: {
-                title: "逃离这座城市",
-                text: "你连夜收拾东西，买了最早的车票离开。可没过多久，你在新城市的街头，看到了他熟悉的身影。他笑着向你走来，说‘你跑不掉的，我找了你好久’。",
+                title: "结局 · 无处可逃的宿命",
+                text: "你抛下一切远走他乡，换城市、换号码、换生活轨迹，以为终于挣脱牢笼。可在陌生城市的街头，你再次看见那个熟悉的身影。他依旧带着浅浅笑意，一步步向你走来，轻声低语：我说过，你永远跑不掉的。从相遇那一刻起，你就注定是他一人的专属。",
+                mood: "mood-mad",
                 choices: [
-                    { text: "结局：他找到你了，再也逃不掉了", next: "endFound" }
+                    { text: "重新开始新的剧情", next: "restart" }
                 ]
             },
             transfer: {
-                title: "偷偷转学",
-                text: "你偷偷转了学，换了手机号，以为终于摆脱了他。可新学校的第一天，你就在教室门口看到了他，他笑着说‘好巧啊，我们又同班了’。",
+                title: "结局 · 如影随形",
+                text: "你悄悄转学隐姓埋名，以为能开启全新生活。可踏入新班级的那一刻，你一眼就看见坐在角落的他。他抬眸看向你，笑意温柔又偏执，仿佛早已算好一切。无论你逃到天涯海角，他都能找到你，永远如影随形。",
+                mood: "mood-dark",
                 choices: [
-                    { text: "结局：无论逃到哪里，他都能找到你", next: "endSameClass" }
+                    { text: "重新开始新的剧情", next: "restart" }
                 ]
             },
             parents: {
-                title: "父母出面",
-                text: "你父母把他赶走了，还报了警。他被警告后，消失了一段时间。你以为终于安全了，可在你返校的路上，他突然冲出来，把你拉进了车里。",
+                title: "结局 · 无声的陨落",
+                text: "父母出面强硬驱赶，甚至报警警告。他暂时消失沉寂，让你以为风波落幕。可在你独自返校的路上，他突然出现，将你带入无人的角落。从此世间再无你的消息，只留下旁人嘴里零星的传闻，而他依旧是众人眼中温柔干净的优秀学长。",
+                mood: "mood-sad",
                 choices: [
-                    { text: "结局：被他带走，再也没有消息", next: "endKidnap" }
+                    { text: "重新开始新的剧情", next: "restart" }
                 ]
             },
             pretend: {
-                title: "假装妥协",
-                text: "你假装答应和他在一起，骗他先离开你家。他走后，你立刻收拾东西，连夜逃到了外地，换了所有联系方式。你再也没见过他，也不知道他有没有来找你。",
+                title: "结局 · 侥幸逃离",
+                text: "你假意妥协稳住他，待他离开后立刻收拾行囊，连夜远走，切断所有过往联系。从此隐于陌生城市，再也不涉足曾经的圈子。虽留下心理阴影，但你终于挣脱那偏执的牢笼，重获安稳与自由。",
+                mood: "mood-normal",
                 choices: [
-                    { text: "结局：成功逃脱，永远消失", next: "endFree" }
+                    { text: "重新开始新的剧情", next: "restart" }
                 ]
             },
-            endObedient: {
-                title: "结局：专属玩具",
-                text: "你彻底放弃了反抗，任由他掌控你的一切。他对你越来越温柔，也越来越偏执，把你关在只有他的世界里。你成了他的专属玩具，再也没有自己的思想和自由，只能笑着对他说‘我只属于你’。",
+            beg: {
+                title: "结局 · 卑微的禁锢",
+                text: "你哭泣哀求放过自己，你的脆弱反而让他生出更强的掌控欲。他温柔安抚你，却把你看得更紧，用温柔困住你的身心。从此你只能乖乖待在他身边，做一个听话、懂事、永远无法逃离的专属恋人。",
+                mood: "mood-dark",
                 choices: [
-                    { text: "重新开始", next: "restart" }
+                    { text: "重新开始新的剧情", next: "restart" }
                 ]
             },
-            runAway: {
-                title: "趁他逃跑",
-                text: "你趁他出门，砸开窗户逃了出去。你不敢回头，一路跑到派出所。他被警察控制住，也终于承认了自己的偏执和控制欲。你看着他被带走的背影，松了口气，终于自由了。",
+            provoke: {
+                title: "结局 · 取证自保",
+                text: "你刻意激怒他，诱导他情绪失控留下过激言行与施暴痕迹，悄悄完整录下证据。凭借充足凭证，你成功申请人身保护，他也因偏执骚扰与过激行为受到处罚。你终于用理智挣脱束缚，走出这场噩梦。",
+                mood: "mood-normal",
                 choices: [
-                    { text: "结局：成功逃脱，重获自由", next: "endFree" }
+                    { text: "重新开始新的剧情", next: "restart" }
                 ]
             },
             escapeRoom: {
-                title: "砸晕他逃出去",
-                text: "你拿起桌上的花瓶砸晕了他，拼尽全力逃了出去。你立刻报警，他被抓了，也终于为自己的偏执付出了代价。你看着他被警察带走的样子，知道这场噩梦终于结束了。",
+                title: "结局 · 勇敢挣脱",
+                text: "你趁他失神奋力反击，逃出封闭的房间，第一时间报警求助。他的偏执与禁锢行为被彻底曝光，受到应有的惩戒。你虽经历惶恐，却凭着勇气挣脱枷锁，重新回归正常生活。",
+                mood: "mood-normal",
                 choices: [
-                    { text: "结局：勇敢反抗，摆脱控制", next: "endFree" }
+                    { text: "重新开始新的剧情", next: "restart" }
                 ]
             },
-            trap: {
-                title: "设计陷阱",
-                text: "你和朋友设计了陷阱，让他在全校面前出丑，曝光了他的骚扰行为。他被学校开除，也成了所有人唾弃的对象。你终于摆脱了他，却也留下了永远的心理阴影。",
+            collectMore: {
+                title: "结局 · 计划败露",
+                text: "你打算慢慢收集更多证据，却被他察觉你的心思。他眼底温柔散尽，只剩冰冷失望，把你彻底禁锢在身边，断绝你所有对外联络。从此你再也没有逃离的机会，永远沦为他笼中的私有物。",
+                mood: "mood-mad",
                 choices: [
-                    { text: "结局：两败俱伤，彻底摆脱", next: "endTrap" }
+                    { text: "重新开始新的剧情", next: "restart" }
                 ]
             },
-            endFound: {
-                title: "结局：无处可逃",
-                text: "他找到了你，温柔地牵起你的手，说‘我说过，你跑不掉的’。你被他带回了家，再也没有离开过。他把你锁在身边，说这才是永远的爱，而你，只能永远做他的专属玩具。",
+            tellFamily: {
+                title: "结局 · 无人救赎",
+                text: "你向他家人坦白一切，可家人偏袒包庇，只当你无理取闹。他得知后彻底被激怒，偏执变本加厉，认定你想毁掉他，从此对你的掌控与监视再也没有底线，你彻底陷入无人救赎的绝境。",
+                mood: "mood-sad",
                 choices: [
-                    { text: "重新开始", next: "restart" }
+                    { text: "重新开始新的剧情", next: "restart" }
                 ]
             },
-            endSameClass: {
-                title: "结局：如影随形",
-                text: "无论你逃到哪里，他都能找到你。他像影子一样跟着你，笑着说‘我们是天生一对’。你终于明白，从你第一次和他说话开始，就再也摆脱不掉他了。",
+            endObedient: {
+                title: "结局 · 温柔囚笼",
+                text: "你彻底放弃反抗，心甘情愿留在他身边。他给你极致的温柔与宠溺，也给你密不透风的禁锢。你拥有他独一份的偏爱，却永远失去自由与自我，甘愿做他一辈子的专属玩具，困在温柔编织的牢笼里，再也不愿醒来。",
+                mood: "mood-dark",
                 choices: [
-                    { text: "重新开始", next: "restart" }
-                ]
-            },
-            endKidnap: {
-                title: "结局：无声消失",
-                text: "你被他拉进了车里，再也没有消息。警察找了很久，只在河边找到了你的书包。而他，依旧是那个温柔帅气的学长，好像什么都没发生过。",
-                choices: [
-                    { text: "重新开始", next: "restart" }
-                ]
-            },
-            endFree: {
-                title: "结局：重获自由",
-                text: "你终于摆脱了他，离开了那个让你窒息的地方。虽然留下了阴影，但你终于可以过自己的生活了。阳光照在你身上，你知道，这场噩梦，终于醒了。",
-                choices: [
-                    { text: "重新开始", next: "restart" }
-                ]
-            },
-            endTrap: {
-                title: "结局：两败俱伤",
-                text: "他被开除了，也成了所有人唾弃的对象。你摆脱了他，却也因为这场闹剧，变得敏感又自卑。你离开了学校，换了城市，慢慢疗愈自己，终于重新找回了生活的勇气。",
-                choices: [
-                    { text: "重新开始", next: "restart" }
+                    { text: "重新开始新的剧情", next: "restart" }
                 ]
             }
         };
 
         let currentScene = "start";
+        const bodyBg = document.getElementById("bodyBg");
+        const gameBox = document.getElementById("gameBox");
+        const titleDom = document.getElementById("title");
+        const textDom = document.getElementById("text");
+        const choicesDom = document.getElementById("choices");
+
+        // 开场动画
+        setTimeout(() => {
+            document.getElementById("startLoader").classList.add("fade-out");
+            setTimeout(() => {
+                gameBox.classList.add("show-container");
+                updateScene();
+            }, 800);
+        }, 2500);
 
         function goToScene(sceneId) {
-            if (sceneId === "restart") {
+            if(sceneId === "restart") {
                 currentScene = "start";
             } else {
                 currentScene = sceneId;
             }
-            updateScene();
+            // 清空渐入状态
+            titleDom.classList.remove("show");
+            textDom.classList.remove("show");
+            choicesDom.classList.remove("show");
+            // 延迟更新 制造情景切换动画感
+            setTimeout(() => {
+                updateScene();
+            }, 600);
         }
 
         function updateScene() {
             const scene = scenes[currentScene];
-            document.getElementById("title").textContent = scene.title;
-            document.getElementById("text").textContent = scene.text;
-            
-            const choicesDiv = document.getElementById("choices");
-            choicesDiv.innerHTML = "";
-            
+            // 切换整体氛围背景
+            bodyBg.className = scene.mood;
+
+            titleDom.textContent = scene.title;
+            textDom.textContent = scene.text;
+
+            // 清空选项
+            choicesDom.innerHTML = "";
+
             scene.choices.forEach(choice => {
                 const btn = document.createElement("button");
                 btn.className = "choice-btn";
-                if (choice.next === "restart" || scene.title.includes("结局")) {
+                if(choice.next === "restart") {
                     btn.classList.add("end-btn");
                 }
                 btn.textContent = choice.text;
                 btn.onclick = () => goToScene(choice.next);
-                choicesDiv.appendChild(btn);
+                choicesDom.appendChild(btn);
             });
-        }
 
-        // 初始加载
-        updateScene();
+            // 文字逐块渐入
+            setTimeout(()=>titleDom.classList.add("show"),150);
+            setTimeout(()=>textDom.classList.add("show"),350);
+            setTimeout(()=>choicesDom.classList.add("show"),550);
+        }
     </script>
 </body>
 </html>
