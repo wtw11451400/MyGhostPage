@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>深夜鬼屋 - 互动故事</title>
+    <title>他的专属玩具 - 病娇恋爱互动</title>
     <style>
         * {
             margin: 0;
@@ -11,8 +11,8 @@
             box-sizing: border-box;
         }
         body {
-            background: #0a0a0a;
-            color: #ddd;
+            background: #1a0a0a;
+            color: #eee;
             font-family: "Microsoft YaHei", sans-serif;
             line-height: 1.8;
             min-height: 100vh;
@@ -27,158 +27,294 @@
             background: #111;
             padding: 30px;
             border-radius: 10px;
-            box-shadow: 0 0 30px rgba(100, 0, 0, 0.5);
-            border: 1px solid #333;
+            box-shadow: 0 0 30px rgba(200, 0, 0, 0.5);
+            border: 1px solid #440000;
         }
         .scene-title {
-            color: #ff4444;
+            color: #ff6666;
             font-size: 24px;
             margin-bottom: 20px;
             text-align: center;
-            text-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
+            text-shadow: 0 0 10px rgba(255, 100, 100, 0.5);
         }
         .scene-text {
             margin-bottom: 30px;
             font-size: 16px;
-            min-height: 120px;
+            min-height: 150px;
         }
         .choice-btn {
             display: block;
             width: 100%;
             padding: 15px;
             margin: 10px 0;
-            background: #222;
+            background: #221111;
             color: #ddd;
-            border: 1px solid #444;
+            border: 1px solid #442222;
             border-radius: 5px;
             cursor: pointer;
             font-size: 16px;
             transition: all 0.3s;
         }
         .choice-btn:hover {
-            background: #333;
-            border-color: #ff4444;
-            color: #ff4444;
+            background: #331a1a;
+            border-color: #ff6666;
+            color: #ff6666;
         }
-        .restart-btn {
+        .end-btn {
             background: #ff4444;
             border-color: #ff4444;
             color: #fff;
         }
-        .restart-btn:hover {
+        .end-btn:hover {
             background: #ff6666;
         }
     </style>
 </head>
 <body>
     <div class="game-container">
-        <h1 class="scene-title" id="title">深夜鬼屋</h1>
-        <p class="scene-text" id="text">你独自来到传说中的废弃鬼屋探险，推开门，一股阴冷的风扑面而来，里面一片漆黑。你要先做什么？</p>
+        <h1 class="scene-title" id="title">他的专属玩具</h1>
+        <p class="scene-text" id="text">你在学校图书馆遇到了他，那个传说中又温柔又帅气的学长。他主动和你搭话，笑容干净又好看，你心动了。这是你们认识的第一天，你会怎么回应？</p>
         <div class="choices" id="choices">
-            <button class="choice-btn" onclick="goToScene('flashlight')">拿出手机打开手电筒</button>
-            <button class="choice-btn" onclick="goToScene('listen')">站在原地，仔细听里面的声音</button>
+            <button class="choice-btn" onclick="goToScene('accept')">笑着回应，和他交换了联系方式</button>
+            <button class="choice-btn" onclick="goToScene('decline')">有点害羞，婉拒了他的搭话</button>
         </div>
     </div>
 
     <script>
         const scenes = {
             start: {
-                title: "深夜鬼屋",
-                text: "你独自来到传说中的废弃鬼屋探险，推开门，一股阴冷的风扑面而来，里面一片漆黑。你要先做什么？",
+                title: "他的专属玩具",
+                text: "你在学校图书馆遇到了他，那个传说中又温柔又帅气的学长。他主动和你搭话，笑容干净又好看，你心动了。这是你们认识的第一天，你会怎么回应？",
                 choices: [
-                    { text: "拿出手机打开手电筒", next: "flashlight" },
-                    { text: "站在原地，仔细听里面的声音", next: "listen" }
+                    { text: "笑着回应，和他交换了联系方式", next: "accept" },
+                    { text: "有点害羞，婉拒了他的搭话", next: "decline" }
                 ]
             },
-            flashlight: {
-                title: "手电筒的光",
-                text: "手电筒微弱的光勉强照亮前方，你看到地上有一串脚印，一直延伸到二楼楼梯口，脚印的方向...好像是朝着你过来的？",
+            accept: {
+                title: "温柔的开始",
+                text: "他的聊天消息秒回，每天都和你分享日常，还会给你送早餐、接你下课。身边的朋友都说他对你太好了，像小说里的男主角。你沉浸在这种被偏爱里，完全没注意到他看你的眼神，越来越深，越来越偏执。",
                 choices: [
-                    { text: "跟着脚印上楼", next: "stairs" },
-                    { text: "关掉手电，转身跑出门", next: "run" }
+                    { text: "答应他的表白，和他在一起", next: "together" },
+                    { text: "觉得发展太快，想再了解一下", next: "slow" }
                 ]
             },
-            listen: {
-                title: "奇怪的声音",
-                text: "你屏住呼吸，听到二楼传来断断续续的脚步声，还有女人的哭声，声音越来越近，好像有人正在下楼。",
+            decline: {
+                title: "婉拒之后",
+                text: "你婉拒了他，转身离开时，没看到他脸上的笑容瞬间消失，眼神冰冷地盯着你的背影。从那天起，你总感觉有人在跟着你，书包里偶尔会出现陌生的纸条，写着你的名字，还有一句‘别想跑’。",
                 choices: [
-                    { text: "躲进旁边的衣柜里", next: "closet" },
-                    { text: "对着楼梯大喊一声：谁在那里！", next: "shout" }
+                    { text: "告诉老师，怀疑被人跟踪", next: "teacher" },
+                    { text: "有点害怕，不敢声张，躲着走", next: "hide" }
                 ]
             },
-            stairs: {
-                title: "二楼走廊",
-                text: "你跟着脚印上了楼，走廊尽头的房间门半开着，里面透出微弱的红光，脚印在门口消失了。",
+            together: {
+                title: "成为他的女朋友",
+                text: "你们在一起了，他对你的好变本加厉，也开始管你的一切：不许和异性说话，不许单独出门，手机要随时给他看。你一开始觉得是在乎，直到他翻出你和男闺蜜的聊天记录，第一次对你发了火。",
                 choices: [
-                    { text: "推开门进去", next: "room" },
-                    { text: "转身往楼下跑", next: "run" }
+                    { text: "和男闺蜜断联，哄他开心", next: "cutFriend" },
+                    { text: "觉得他管得太宽，和他吵架", next: "fight" }
                 ]
             },
-            closet: {
-                title: "衣柜里",
-                text: "你躲进衣柜，透过缝隙看到一个穿白衣服的女人从楼梯走下来，她的脸苍白如纸，眼睛正盯着你躲的衣柜。",
+            slow: {
+                title: "再了解一下",
+                text: "你说想再了解一下，他脸上的笑容僵了一下，很快又恢复温柔，说没关系，会等你。但从那天起，他开始出现在你所有的地方：你上课的教室、兼职的奶茶店、甚至你家楼下。",
                 choices: [
-                    { text: "屏住呼吸，一动不动", next: "still" },
-                    { text: "突然推开衣柜冲出去", next: "run" }
+                    { text: "被他的坚持打动，答应和他在一起", next: "together" },
+                    { text: "感觉被监视，开始疏远他", next: "distance" }
                 ]
             },
-            shout: {
-                title: "回声",
-                text: "你的喊声在空屋里回荡，哭声和脚步声突然停了，四周死一般的寂静，下一秒，所有的声音都从你身后传来了。",
+            teacher: {
+                title: "告诉老师",
+                text: "你把被跟踪的事告诉了老师，学校找他谈话，他否认了一切，还反过来对你嘘寒问暖，说担心你被坏人骚扰。老师信了他的话，反而劝你别多想。你这才发现，他早就把自己塑造成了关心你的学长形象。",
                 choices: [
-                    { text: "慢慢回头看", next: "look" },
-                    { text: "头也不回地往外冲", next: "run" }
+                    { text: "意识到危险，立刻报警", next: "police" },
+                    { text: "害怕他报复，不敢再提", next: "silent" }
                 ]
             },
-            room: {
-                title: "红光房间",
-                text: "你推开门，看到房间里摆着一张旧床，床上躺着一个穿红衣服的娃娃，娃娃的眼睛正盯着你，嘴角在笑。",
+            hide: {
+                title: "躲着走",
+                text: "你开始绕路走，可无论你走哪条路，总能遇到他。他会笑着说‘好巧啊’，但你看到他口袋里露出的、和纸条上一样的字迹。你越来越害怕，晚上不敢出门，手机不敢开机。",
                 choices: [
-                    { text: "伸手去碰娃娃", next: "touch" },
-                    { text: "转身跑下楼", next: "run" }
+                    { text: "鼓起勇气问他为什么跟着自己", next: "confront" },
+                    { text: "请假回家，再也不来学校", next: "escapeHome" }
                 ]
             },
-            still: {
-                title: "安全？",
-                text: "女人停在衣柜前，你听到她的指甲在衣柜门上划来划去的声音，过了一会儿，脚步声慢慢走远了。",
+            cutFriend: {
+                title: "为他断联",
+                text: "你删掉了男闺蜜，他终于消了气，抱着你说‘这样才乖’。但这只是开始，他开始管你的穿着，不让你穿裙子，不让你和女生出去玩，甚至把你手机里所有异性的联系方式都删光了。",
                 choices: [
-                    { text: "等了几分钟，打开衣柜出来", next: "escape" },
-                    { text: "一直躲到天亮", next: "trapped" }
+                    { text: "继续妥协，怕他生气", next: "compromise" },
+                    { text: "忍无可忍，提出分手", next: "breakup" }
                 ]
             },
-            touch: {
-                title: "娃娃的诅咒",
-                text: "你的手刚碰到娃娃，它突然睁开了眼睛，红光瞬间照亮了整个房间，你感觉身体越来越冷，再也动不了了...",
+            fight: {
+                title: "和他吵架",
+                text: "你和他吵了起来，说他控制欲太强。他第一次对你发了很大的火，摔了你的杯子，说‘我都是为了你好，你只能是我的’。你被吓到了，第一次觉得他陌生又可怕。",
                 choices: [
-                    { text: "游戏结束，重新开始", next: "restart" }
+                    { text: "服软道歉，不敢再和他吵", next: "compromise" },
+                    { text: "坚定地提出分手，说受不了他", next: "breakup" }
                 ]
             },
-            look: {
-                title: "直面恐惧",
-                text: "你慢慢回头，看到那个女人就站在你身后，她的脸离你只有几厘米，你闻到一股冰冷的霉味，她对着你笑了。",
+            distance: {
+                title: "开始疏远",
+                text: "你开始不回他的消息，不接他的电话，他却变本加厉地出现在你面前。他堵在你家门口，红着眼睛问你‘为什么不理我’，语气里的偏执让你浑身发冷。",
                 choices: [
-                    { text: "游戏结束，重新开始", next: "restart" }
+                    { text: "被他吓到，答应和他试试", next: "together" },
+                    { text: "态度坚决，说不想和他有牵扯", next: "refuse" }
                 ]
             },
-            run: {
-                title: "逃出生天",
-                text: "你拼命往外跑，身后的脚步声一直在追你，你冲出大门，阳光照在身上，身后的鬼屋瞬间安静了下来，你活下来了！",
+            police: {
+                title: "报警",
+                text: "你报了警，可他没有做出实质伤害，警察只能口头警告。从派出所出来的那天，他第一次露出了真面目，眼神冰冷地看着你，说‘你惹火我了’。",
                 choices: [
-                    { text: "游戏结束，重新开始", next: "restart" }
+                    { text: "申请学校保护，搬去宿舍住", next: "protect" },
+                    { text: "收拾东西，立刻离开这座城市", next: "escapeCity" }
                 ]
             },
-            escape: {
-                title: "安全逃离",
-                text: "你打开衣柜，发现那个女人不见了，你赶紧跑出鬼屋，直到跑到大街上才敢回头，鬼屋的门已经关上了，你安全了。",
+            silent: {
+                title: "不敢再提",
+                text: "你不敢再提，只能任由他出现在你生活里。他开始以‘保护你’为由，接送你上下课，甚至跟着你去兼职。身边的人都以为你们是情侣，只有你知道，这是一场无止境的监视。",
                 choices: [
-                    { text: "游戏结束，重新开始", next: "restart" }
+                    { text: "试着接受他，说不定他只是太在乎", next: "together" },
+                    { text: "找机会偷偷转学，离开这里", next: "transfer" }
                 ]
             },
-            trapped: {
-                title: "永远的衣柜",
-                text: "你躲在衣柜里不敢出来，不知道过了多久，衣柜里越来越冷，你感觉自己的意识越来越模糊，再也没出去过...",
+            confront: {
+                title: "当面质问",
+                text: "你拦住他，问他为什么一直跟着你。他笑着承认了，说‘因为我喜欢你啊，我要看着你，不让别人抢走’。他的笑容依旧温柔，可眼神里的疯狂让你不寒而栗。",
                 choices: [
-                    { text: "游戏结束，重新开始", next: "restart" }
+                    { text: "被他的偏执吓到，答应和他在一起", next: "together" },
+                    { text: "明确拒绝，说不喜欢他这样", next: "refuse" }
+                ]
+            },
+            escapeHome: {
+                title: "回家躲避",
+                text: "你请假回了家，以为能躲开他。可没过几天，你家门口出现了他的身影，他说‘我找到你了’。你才发现，他早就知道你家的地址，甚至比你自己还了解你的一切。",
+                choices: [
+                    { text: "让父母出面赶走他", next: "parents" },
+                    { text: "假装妥协，骗他离开", next: "pretend" }
+                ]
+            },
+            compromise: {
+                title: "不断妥协",
+                text: "你一次次妥协，失去了朋友，失去了爱好，甚至失去了和家人联系的自由。你被困在他的世界里，像他的专属玩具。他对你越来越温柔，也越来越偏执，连你看别人一眼都会生气。",
+                choices: [
+                    { text: "彻底放弃反抗，接受现状", next: "endObedient" },
+                    { text: "趁他不注意，偷偷逃跑", next: "runAway" }
+                ]
+            },
+            breakup: {
+                title: "提出分手",
+                text: "你说要分手，他愣住了，然后突然笑了，说‘分手？你想跑到哪里去？’他把你锁在房间里，第一次对你动手，说‘你哪里也别想去，只能留在我身边’。",
+                choices: [
+                    { text: "害怕得哭着道歉，求他原谅", next: "compromise" },
+                    { text: "趁他不备，砸晕他逃出去", next: "escapeRoom" }
+                ]
+            },
+            refuse: {
+                title: "明确拒绝",
+                text: "你明确拒绝了他，说不喜欢他这样。他的笑容消失了，眼神冰冷地说‘没关系，我会让你喜欢上我的，用我的方式’。从那天起，他的跟踪和骚扰变本加厉，甚至开始威胁你的家人。",
+                choices: [
+                    { text: "为了保护家人，答应和他在一起", next: "together" },
+                    { text: "立刻搬家，换手机号消失", next: "escapeCity" }
+                ]
+            },
+            protect: {
+                title: "学校保护",
+                text: "学校安排了老师保护你，可他总能找到机会接近你。他在你宿舍楼下等你，给你送带血的玫瑰，说‘你越反抗，我越想要你’。你被吓得精神恍惚，连课都不敢去上。",
+                choices: [
+                    { text: "申请休学，回家躲着", next: "escapeHome" },
+                    { text: "联合朋友设计，让他出丑", next: "trap" }
+                ]
+            },
+            escapeCity: {
+                title: "逃离这座城市",
+                text: "你连夜收拾东西，买了最早的车票离开。可没过多久，你在新城市的街头，看到了他熟悉的身影。他笑着向你走来，说‘你跑不掉的，我找了你好久’。",
+                choices: [
+                    { text: "结局：他找到你了，再也逃不掉了", next: "endFound" }
+                ]
+            },
+            transfer: {
+                title: "偷偷转学",
+                text: "你偷偷转了学，换了手机号，以为终于摆脱了他。可新学校的第一天，你就在教室门口看到了他，他笑着说‘好巧啊，我们又同班了’。",
+                choices: [
+                    { text: "结局：无论逃到哪里，他都能找到你", next: "endSameClass" }
+                ]
+            },
+            parents: {
+                title: "父母出面",
+                text: "你父母把他赶走了，还报了警。他被警告后，消失了一段时间。你以为终于安全了，可在你返校的路上，他突然冲出来，把你拉进了车里。",
+                choices: [
+                    { text: "结局：被他带走，再也没有消息", next: "endKidnap" }
+                ]
+            },
+            pretend: {
+                title: "假装妥协",
+                text: "你假装答应和他在一起，骗他先离开你家。他走后，你立刻收拾东西，连夜逃到了外地，换了所有联系方式。你再也没见过他，也不知道他有没有来找你。",
+                choices: [
+                    { text: "结局：成功逃脱，永远消失", next: "endFree" }
+                ]
+            },
+            endObedient: {
+                title: "结局：专属玩具",
+                text: "你彻底放弃了反抗，任由他掌控你的一切。他对你越来越温柔，也越来越偏执，把你关在只有他的世界里。你成了他的专属玩具，再也没有自己的思想和自由，只能笑着对他说‘我只属于你’。",
+                choices: [
+                    { text: "重新开始", next: "restart" }
+                ]
+            },
+            runAway: {
+                title: "趁他逃跑",
+                text: "你趁他出门，砸开窗户逃了出去。你不敢回头，一路跑到派出所。他被警察控制住，也终于承认了自己的偏执和控制欲。你看着他被带走的背影，松了口气，终于自由了。",
+                choices: [
+                    { text: "结局：成功逃脱，重获自由", next: "endFree" }
+                ]
+            },
+            escapeRoom: {
+                title: "砸晕他逃出去",
+                text: "你拿起桌上的花瓶砸晕了他，拼尽全力逃了出去。你立刻报警，他被抓了，也终于为自己的偏执付出了代价。你看着他被警察带走的样子，知道这场噩梦终于结束了。",
+                choices: [
+                    { text: "结局：勇敢反抗，摆脱控制", next: "endFree" }
+                ]
+            },
+            trap: {
+                title: "设计陷阱",
+                text: "你和朋友设计了陷阱，让他在全校面前出丑，曝光了他的骚扰行为。他被学校开除，也成了所有人唾弃的对象。你终于摆脱了他，却也留下了永远的心理阴影。",
+                choices: [
+                    { text: "结局：两败俱伤，彻底摆脱", next: "endTrap" }
+                ]
+            },
+            endFound: {
+                title: "结局：无处可逃",
+                text: "他找到了你，温柔地牵起你的手，说‘我说过，你跑不掉的’。你被他带回了家，再也没有离开过。他把你锁在身边，说这才是永远的爱，而你，只能永远做他的专属玩具。",
+                choices: [
+                    { text: "重新开始", next: "restart" }
+                ]
+            },
+            endSameClass: {
+                title: "结局：如影随形",
+                text: "无论你逃到哪里，他都能找到你。他像影子一样跟着你，笑着说‘我们是天生一对’。你终于明白，从你第一次和他说话开始，就再也摆脱不掉他了。",
+                choices: [
+                    { text: "重新开始", next: "restart" }
+                ]
+            },
+            endKidnap: {
+                title: "结局：无声消失",
+                text: "你被他拉进了车里，再也没有消息。警察找了很久，只在河边找到了你的书包。而他，依旧是那个温柔帅气的学长，好像什么都没发生过。",
+                choices: [
+                    { text: "重新开始", next: "restart" }
+                ]
+            },
+            endFree: {
+                title: "结局：重获自由",
+                text: "你终于摆脱了他，离开了那个让你窒息的地方。虽然留下了阴影，但你终于可以过自己的生活了。阳光照在你身上，你知道，这场噩梦，终于醒了。",
+                choices: [
+                    { text: "重新开始", next: "restart" }
+                ]
+            },
+            endTrap: {
+                title: "结局：两败俱伤",
+                text: "他被开除了，也成了所有人唾弃的对象。你摆脱了他，却也因为这场闹剧，变得敏感又自卑。你离开了学校，换了城市，慢慢疗愈自己，终于重新找回了生活的勇气。",
+                choices: [
+                    { text: "重新开始", next: "restart" }
                 ]
             }
         };
@@ -205,8 +341,8 @@
             scene.choices.forEach(choice => {
                 const btn = document.createElement("button");
                 btn.className = "choice-btn";
-                if (choice.next === "restart") {
-                    btn.classList.add("restart-btn");
+                if (choice.next === "restart" || scene.title.includes("结局")) {
+                    btn.classList.add("end-btn");
                 }
                 btn.textContent = choice.text;
                 btn.onclick = () => goToScene(choice.next);
