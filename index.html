@@ -1,161 +1,221 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>暗黑故事合集</title>
+    <title>深夜鬼屋 - 互动故事</title>
     <style>
-        *{margin:0;padding:0;box-sizing:border-box;}
-        body{
-            background:#050505;
-            color:#ddd;
-            font-family:"宋体",serif;
-            line-height:2.2;
-            padding:30px 20px;
-            max-width:600px;
-            margin:0 auto;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .menu{
-            text-align:center;
-            margin-top:50px;
+        body {
+            background: #0a0a0a;
+            color: #ddd;
+            font-family: "Microsoft YaHei", sans-serif;
+            line-height: 1.8;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
-        .menu button{
-            display:block;
-            width:80%;
-            margin:15px auto;
-            padding:12px;
-            background:#8b0000;
-            color:#fff;
-            border:none;
-            font-size:16px;
-            border-radius:6px;
+        .game-container {
+            max-width: 600px;
+            width: 100%;
+            background: #111;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(100, 0, 0, 0.5);
+            border: 1px solid #333;
         }
-        .menu button:hover{background:#b30000;}
-        .story{display:none;}
-        .red{color:#b30000;font-weight:bold;}
-        .shake{animation:shake 0.5s infinite;}
-        @keyframes shake{
-            0%{transform:translate(0,0);}
-            25%{transform:translate(-1px,1px);}
-            50%{transform:translate(1px,-1px);}
-            75%{transform:translate(-1px,-1px);}
+        .scene-title {
+            color: #ff4444;
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
         }
-        .back{
-            margin-top:30px;
-            padding:8px 20px;
-            background:#333;
-            color:#fff;
-            border:none;
+        .scene-text {
+            margin-bottom: 30px;
+            font-size: 16px;
+            min-height: 120px;
         }
-        .result{color:#ff4444;margin-top:20px;display:none;}
+        .choice-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background: #222;
+            color: #ddd;
+            border: 1px solid #444;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        .choice-btn:hover {
+            background: #333;
+            border-color: #ff4444;
+            color: #ff4444;
+        }
+        .restart-btn {
+            background: #ff4444;
+            border-color: #ff4444;
+            color: #fff;
+        }
+        .restart-btn:hover {
+            background: #ff6666;
+        }
     </style>
 </head>
 <body>
+    <div class="game-container">
+        <h1 class="scene-title" id="title">深夜鬼屋</h1>
+        <p class="scene-text" id="text">你独自来到传说中的废弃鬼屋探险，推开门，一股阴冷的风扑面而来，里面一片漆黑。你要先做什么？</p>
+        <div class="choices" id="choices">
+            <button class="choice-btn" onclick="goToScene('flashlight')">拿出手机打开手电筒</button>
+            <button class="choice-btn" onclick="goToScene('listen')">站在原地，仔细听里面的声音</button>
+        </div>
+    </div>
 
-<div id="mainMenu" class="menu">
-    <h2>匿名档案 · 故事合集</h2>
-    <br>
-    <button onclick="showStory(1)">① 雨夜窥视</button>
-    <button onclick="showStory(2)">② 纯白囚笼</button>
-    <button onclick="showStory(3)">③ 隔壁房客</button>
-</div>
+    <script>
+        const scenes = {
+            start: {
+                title: "深夜鬼屋",
+                text: "你独自来到传说中的废弃鬼屋探险，推开门，一股阴冷的风扑面而来，里面一片漆黑。你要先做什么？",
+                choices: [
+                    { text: "拿出手机打开手电筒", next: "flashlight" },
+                    { text: "站在原地，仔细听里面的声音", next: "listen" }
+                ]
+            },
+            flashlight: {
+                title: "手电筒的光",
+                text: "手电筒微弱的光勉强照亮前方，你看到地上有一串脚印，一直延伸到二楼楼梯口，脚印的方向...好像是朝着你过来的？",
+                choices: [
+                    { text: "跟着脚印上楼", next: "stairs" },
+                    { text: "关掉手电，转身跑出门", next: "run" }
+                ]
+            },
+            listen: {
+                title: "奇怪的声音",
+                text: "你屏住呼吸，听到二楼传来断断续续的脚步声，还有女人的哭声，声音越来越近，好像有人正在下楼。",
+                choices: [
+                    { text: "躲进旁边的衣柜里", next: "closet" },
+                    { text: "对着楼梯大喊一声：谁在那里！", next: "shout" }
+                ]
+            },
+            stairs: {
+                title: "二楼走廊",
+                text: "你跟着脚印上了楼，走廊尽头的房间门半开着，里面透出微弱的红光，脚印在门口消失了。",
+                choices: [
+                    { text: "推开门进去", next: "room" },
+                    { text: "转身往楼下跑", next: "run" }
+                ]
+            },
+            closet: {
+                title: "衣柜里",
+                text: "你躲进衣柜，透过缝隙看到一个穿白衣服的女人从楼梯走下来，她的脸苍白如纸，眼睛正盯着你躲的衣柜。",
+                choices: [
+                    { text: "屏住呼吸，一动不动", next: "still" },
+                    { text: "突然推开衣柜冲出去", next: "run" }
+                ]
+            },
+            shout: {
+                title: "回声",
+                text: "你的喊声在空屋里回荡，哭声和脚步声突然停了，四周死一般的寂静，下一秒，所有的声音都从你身后传来了。",
+                choices: [
+                    { text: "慢慢回头看", next: "look" },
+                    { text: "头也不回地往外冲", next: "run" }
+                ]
+            },
+            room: {
+                title: "红光房间",
+                text: "你推开门，看到房间里摆着一张旧床，床上躺着一个穿红衣服的娃娃，娃娃的眼睛正盯着你，嘴角在笑。",
+                choices: [
+                    { text: "伸手去碰娃娃", next: "touch" },
+                    { text: "转身跑下楼", next: "run" }
+                ]
+            },
+            still: {
+                title: "安全？",
+                text: "女人停在衣柜前，你听到她的指甲在衣柜门上划来划去的声音，过了一会儿，脚步声慢慢走远了。",
+                choices: [
+                    { text: "等了几分钟，打开衣柜出来", next: "escape" },
+                    { text: "一直躲到天亮", next: "trapped" }
+                ]
+            },
+            touch: {
+                title: "娃娃的诅咒",
+                text: "你的手刚碰到娃娃，它突然睁开了眼睛，红光瞬间照亮了整个房间，你感觉身体越来越冷，再也动不了了...",
+                choices: [
+                    { text: "游戏结束，重新开始", next: "restart" }
+                ]
+            },
+            look: {
+                title: "直面恐惧",
+                text: "你慢慢回头，看到那个女人就站在你身后，她的脸离你只有几厘米，你闻到一股冰冷的霉味，她对着你笑了。",
+                choices: [
+                    { text: "游戏结束，重新开始", next: "restart" }
+                ]
+            },
+            run: {
+                title: "逃出生天",
+                text: "你拼命往外跑，身后的脚步声一直在追你，你冲出大门，阳光照在身上，身后的鬼屋瞬间安静了下来，你活下来了！",
+                choices: [
+                    { text: "游戏结束，重新开始", next: "restart" }
+                ]
+            },
+            escape: {
+                title: "安全逃离",
+                text: "你打开衣柜，发现那个女人不见了，你赶紧跑出鬼屋，直到跑到大街上才敢回头，鬼屋的门已经关上了，你安全了。",
+                choices: [
+                    { text: "游戏结束，重新开始", next: "restart" }
+                ]
+            },
+            trapped: {
+                title: "永远的衣柜",
+                text: "你躲在衣柜里不敢出来，不知道过了多久，衣柜里越来越冷，你感觉自己的意识越来越模糊，再也没出去过...",
+                choices: [
+                    { text: "游戏结束，重新开始", next: "restart" }
+                ]
+            }
+        };
 
-<div id="s1" class="story">
-    <h2>05.14 雨 · 窗上有雾</h2>
-    <p>今天又看见你了。<br>
-    你在窗边发呆，手指在玻璃上画圈。<br>
-    我在对面楼的窗口，数着你眨眼的次数。</p>
-    <p class="red">你以为拉上窗帘，我就看不到了吗？</p>
-    <p>昨晚你翻了三次身。<br>
-    我都记下来了。<br>
-    你说梦话的时候，喊的是我的名字吗？</p>
-    <p>你愿意永远留在我身边吗？</p>
-    <button onclick="yes1()">愿意</button>
-    <button onclick="no1()">不愿意</button>
-    <div id="res1" class="result"></div>
-    <br>
-    <button class="back" onclick="backMenu()">返回菜单</button>
-</div>
+        let currentScene = "start";
 
-<div id="s2" class="story">
-    <h2>纯白房间 · 无日期</h2>
-    <p>这里很干净，没有风雨，没有外人。<br>
-    只适合你和我两个人。</p>
-    <p class="red">我把所有出口都封住了。</p>
-    <p>不用害怕，我不会伤害你。<br>
-    只是不想让你离开我的视线。<br>
-    你的呼吸、笑容、情绪，都只能属于我。</p>
-    <p>愿意留在这座只属于我们的牢笼里吗？</p>
-    <button onclick="yes2()">愿意</button>
-    <button onclick="no2()">不愿意</button>
-    <div id="res2" class="result"></div>
-    <br>
-    <button class="back" onclick="backMenu()">返回菜单</button>
-</div>
+        function goToScene(sceneId) {
+            if (sceneId === "restart") {
+                currentScene = "start";
+            } else {
+                currentScene = sceneId;
+            }
+            updateScene();
+        }
 
-<div id="s3" class="story">
-    <h2>合租日记 · 邻室记录</h2>
-    <p>我住在你隔壁房间。<br>
-    你的作息、几点关灯、几点起床，我全都记着。</p>
-    <p class="red">你不在家的时候，我悄悄路过你的门口。</p>
-    <p>我知道你喜欢吃什么、喜欢听什么歌。<br>
-    你以为我们只是普通邻居？<br>
-    早就不是了。</p>
-    <p>愿意让我一直陪着你生活吗？</p>
-    <button onclick="yes3()">愿意</button>
-    <button onclick="no3()">不愿意</button>
-    <div id="res3" class="result"></div>
-    <br>
-    <button class="back" onclick="backMenu()">返回菜单</button>
-</div>
+        function updateScene() {
+            const scene = scenes[currentScene];
+            document.getElementById("title").textContent = scene.title;
+            document.getElementById("text").textContent = scene.text;
+            
+            const choicesDiv = document.getElementById("choices");
+            choicesDiv.innerHTML = "";
+            
+            scene.choices.forEach(choice => {
+                const btn = document.createElement("button");
+                btn.className = "choice-btn";
+                if (choice.next === "restart") {
+                    btn.classList.add("restart-btn");
+                }
+                btn.textContent = choice.text;
+                btn.onclick = () => goToScene(choice.next);
+                choicesDiv.appendChild(btn);
+            });
+        }
 
-<script>
-function showStory(n){
-    document.getElementById('mainMenu').style.display='none';
-    document.getElementById('s1').style.display='none';
-    document.getElementById('s2').style.display='none';
-    document.getElementById('s3').style.display='none';
-    document.getElementById('s'+n).style.display='block';
-}
-function backMenu(){
-    document.getElementById('mainMenu').style.display='block';
-    document.getElementById('s1').style.display='none';
-    document.getElementById('s2').style.display='none';
-    document.getElementById('s3').style.display='none';
-}
-
-function yes1(){
-    document.getElementById('res1').innerHTML="<span class='shake'>真好……这样你就永远逃不出我的视线了，一直陪着我。</span>";
-    document.getElementById('res1').style.display='block';
-}
-function no1(){
-    document.getElementById('res1').innerHTML="<span class='red shake'>不准拒绝……雨夜很长，我有的是时间慢慢等你妥协。</span>";
-    document.getElementById('res1').style.display='block';
-}
-
-function yes2(){
-    document.getElementById('res2').innerHTML="<span class='shake'>太好了，永远留在纯白的房间里，只有我们两个人。</span>";
-    document.getElementById('res2').style.display='block';
-}
-function no2(){
-    document.getElementById('res2').innerHTML="<span class='red shake'>已经没有出口了，你只能乖乖留下来陪我。</span>";
-    document.getElementById('res2').style.display='block';
-}
-
-function yes3(){
-    document.getElementById('res3').innerHTML="<span class='shake'>太好了，以后朝夕相处，我会一直看着你。</span>";
-    document.getElementById('res3').style.display='block';
-}
-function no3(){
-    document.getElementById('res3').innerHTML="<span class='red shake'>你躲不开的，隔壁的我，一直都在。</span>";
-    document.getElementById('res3').style.display='block';
-}
-
-const audio=new Audio("data:audio/wav;base64,UklGRiIAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAAABmYWN0BAAAAAAAAABkYXRhAAAAAA==");
-audio.loop=true;
-audio.volume=0.15;
-document.body.addEventListener("click",()=>audio.play());
-</script>
-
+        // 初始加载
+        updateScene();
+    </script>
 </body>
 </html>
