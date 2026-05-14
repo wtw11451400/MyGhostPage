@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>暗黑故事合集</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{
+            background:#050505;
+            color:#ddd;
+            font-family:"宋体",serif;
+            line-height:2.2;
+            padding:30px 20px;
+            max-width:600px;
+            margin:0 auto;
+        }
+        .menu{
+            text-align:center;
+            margin-top:50px;
+        }
+        .menu button{
+            display:block;
+            width:80%;
+            margin:15px auto;
+            padding:12px;
+            background:#8b0000;
+            color:#fff;
+            border:none;
+            font-size:16px;
+            border-radius:6px;
+        }
+        .menu button:hover{background:#b30000;}
+        .story{display:none;}
+        .red{color:#b30000;font-weight:bold;}
+        .shake{animation:shake 0.5s infinite;}
+        @keyframes shake{
+            0%{transform:translate(0,0);}
+            25%{transform:translate(-1px,1px);}
+            50%{transform:translate(1px,-1px);}
+            75%{transform:translate(-1px,-1px);}
+        }
+        .back{
+            margin-top:30px;
+            padding:8px 20px;
+            background:#333;
+            color:#fff;
+            border:none;
+        }
+        .result{color:#ff4444;margin-top:20px;display:none;}
+    </style>
+</head>
+<body>
+
+<div id="mainMenu" class="menu">
+    <h2>匿名档案 · 故事合集</h2>
+    <br>
+    <button onclick="showStory(1)">① 雨夜窥视</button>
+    <button onclick="showStory(2)">② 纯白囚笼</button>
+    <button onclick="showStory(3)">③ 隔壁房客</button>
+</div>
+
+<div id="s1" class="story">
+    <h2>05.14 雨 · 窗上有雾</h2>
+    <p>今天又看见你了。<br>
+    你在窗边发呆，手指在玻璃上画圈。<br>
+    我在对面楼的窗口，数着你眨眼的次数。</p>
+    <p class="red">你以为拉上窗帘，我就看不到了吗？</p>
+    <p>昨晚你翻了三次身。<br>
+    我都记下来了。<br>
+    你说梦话的时候，喊的是我的名字吗？</p>
+    <p>你愿意永远留在我身边吗？</p>
+    <button onclick="yes1()">愿意</button>
+    <button onclick="no1()">不愿意</button>
+    <div id="res1" class="result"></div>
+    <br>
+    <button class="back" onclick="backMenu()">返回菜单</button>
+</div>
+
+<div id="s2" class="story">
+    <h2>纯白房间 · 无日期</h2>
+    <p>这里很干净，没有风雨，没有外人。<br>
+    只适合你和我两个人。</p>
+    <p class="red">我把所有出口都封住了。</p>
+    <p>不用害怕，我不会伤害你。<br>
+    只是不想让你离开我的视线。<br>
+    你的呼吸、笑容、情绪，都只能属于我。</p>
+    <p>愿意留在这座只属于我们的牢笼里吗？</p>
+    <button onclick="yes2()">愿意</button>
+    <button onclick="no2()">不愿意</button>
+    <div id="res2" class="result"></div>
+    <br>
+    <button class="back" onclick="backMenu()">返回菜单</button>
+</div>
+
+<div id="s3" class="story">
+    <h2>合租日记 · 邻室记录</h2>
+    <p>我住在你隔壁房间。<br>
+    你的作息、几点关灯、几点起床，我全都记着。</p>
+    <p class="red">你不在家的时候，我悄悄路过你的门口。</p>
+    <p>我知道你喜欢吃什么、喜欢听什么歌。<br>
+    你以为我们只是普通邻居？<br>
+    早就不是了。</p>
+    <p>愿意让我一直陪着你生活吗？</p>
+    <button onclick="yes3()">愿意</button>
+    <button onclick="no3()">不愿意</button>
+    <div id="res3" class="result"></div>
+    <br>
+    <button class="back" onclick="backMenu()">返回菜单</button>
+</div>
+
+<script>
+function showStory(n){
+    document.getElementById('mainMenu').style.display='none';
+    document.getElementById('s1').style.display='none';
+    document.getElementById('s2').style.display='none';
+    document.getElementById('s3').style.display='none';
+    document.getElementById('s'+n).style.display='block';
+}
+function backMenu(){
+    document.getElementById('mainMenu').style.display='block';
+    document.getElementById('s1').style.display='none';
+    document.getElementById('s2').style.display='none';
+    document.getElementById('s3').style.display='none';
+}
+
+function yes1(){
+    document.getElementById('res1').innerHTML="<span class='shake'>真好……这样你就永远逃不出我的视线了，一直陪着我。</span>";
+    document.getElementById('res1').style.display='block';
+}
+function no1(){
+    document.getElementById('res1').innerHTML="<span class='red shake'>不准拒绝……雨夜很长，我有的是时间慢慢等你妥协。</span>";
+    document.getElementById('res1').style.display='block';
+}
+
+function yes2(){
+    document.getElementById('res2').innerHTML="<span class='shake'>太好了，永远留在纯白的房间里，只有我们两个人。</span>";
+    document.getElementById('res2').style.display='block';
+}
+function no2(){
+    document.getElementById('res2').innerHTML="<span class='red shake'>已经没有出口了，你只能乖乖留下来陪我。</span>";
+    document.getElementById('res2').style.display='block';
+}
+
+function yes3(){
+    document.getElementById('res3').innerHTML="<span class='shake'>太好了，以后朝夕相处，我会一直看着你。</span>";
+    document.getElementById('res3').style.display='block';
+}
+function no3(){
+    document.getElementById('res3').innerHTML="<span class='red shake'>你躲不开的，隔壁的我，一直都在。</span>";
+    document.getElementById('res3').style.display='block';
+}
+
+const audio=new Audio("data:audio/wav;base64,UklGRiIAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAAABmYWN0BAAAAAAAAABkYXRhAAAAAA==");
+audio.loop=true;
+audio.volume=0.15;
+document.body.addEventListener("click",()=>audio.play());
+</script>
+
+</body>
+</html>
