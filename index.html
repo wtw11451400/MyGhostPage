@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>偏执爱意 · 终极完整版</title>
+    <title>偏执爱意 · 无尽缠绵</title>
     <style>
         * {
             margin: 0;
@@ -63,6 +63,23 @@
             50%{transform:translateY(-50%) scale(1.5); opacity:1; text-shadow:0 0 30px red;}
         }
 
+        /* 病娇弹幕样式 */
+        .barrage {
+            position: fixed;
+            color: #ff5050;
+            font-size: 15px;
+            font-weight: bold;
+            text-shadow: 0 0 6px #ff0000;
+            white-space: nowrap;
+            z-index: 100;
+            pointer-events: none;
+            animation: barrageMove 7s linear forwards;
+        }
+        @keyframes barrageMove {
+            from { right: -200px; }
+            to { right: 120%; }
+        }
+
         .game-container {
             max-width: 620px;
             width: 100%;
@@ -91,7 +108,7 @@
         .scene-text {
             margin-bottom: 32px;
             font-size: 15.5px;
-            min-height: 200px;
+            min-height: 220px;
             transition: color 0.5s ease;
             white-space: pre-line;
         }
@@ -209,17 +226,6 @@
             background: #ff2222;
             box-shadow: 0 0 15px #ff3333;
         }
-
-        .yandere-text {
-            color: #ff4444;
-            font-weight: bold;
-            text-shadow: 0 0 8px #ff0000;
-            animation: yandereShake 0.5s ease-in-out infinite alternate;
-        }
-        @keyframes yandereShake {
-            from{transform: translateX(0);}
-            to{transform: translateX(3px);}
-        }
     </style>
 </head>
 <body>
@@ -245,6 +251,16 @@
         let loveValue = 50;
         let senseValue = 60;
         let dangerValue = 30;
+
+        // 生成病娇弹幕
+        function createBarrage(text){
+            let div = document.createElement("div");
+            div.className = "barrage";
+            div.innerText = text;
+            div.style.top = Math.random() * 85 + "%";
+            document.body.appendChild(div);
+            setTimeout(()=>div.remove(),7000);
+        }
 
         function updateHeartAnimation(){
             let l = document.getElementById("heartLeft");
@@ -274,276 +290,302 @@
         const scenes = {
             start:{
                 title:"序章·暮色初遇",
-                text:"黄昏的风掠过校园，你独自走在林荫道上。夕阳把树影拉得很长，空气里带着晚夏的余温。不远处，那位气质清冷、长相绝美的姐姐一直望着你，视线灼热得让你无法忽视。她站在梧桐树下，似乎已经等你很久很久，眼底藏着你看不懂的偏执与期待。",
+                text:"黄昏晚风拂过整片校园，梧桐枝叶轻轻摇晃，洒落满地细碎金光。你独自一人漫步在幽静林荫小道，思绪闲散漫无目的。道路尽头的老树下，一位容貌清丽气质清冷的女子静静伫立，目光自始至终牢牢锁定在你的身上，眼底翻涌着藏不住的执念与绵长爱意，仿佛已经在此等候了你无数个日夜。",
                 mood:"mood-normal",
                 choices:[
-                    {text:"主动上前打招呼",next:"meet1",love:12,sense:-3,danger:-5,popup:"❤️ 姐姐内心：你终于主动走向我了，我等这一天，等了太久太久..."},
-                    {text:"假装没看见，继续走",next:"cold1",love:-15,sense:5,danger:18,popup:"⚠️ 姐姐内心：你居然无视我...没关系，我会让你再也离不开我。"},
-                    {text:"害羞低头，放慢脚步",next:"shy1",love:8,sense:0,danger:0,popup:"❤️ 姐姐内心：你害羞的样子，可爱到让我想立刻把你藏起来。"},
-                    {text:"好奇多看她几眼",next:"chat1",love:10,sense:-2,danger:-3,popup:"❤️ 姐姐内心：你的目光，是我活下去的全部意义。"}
+                    {text:"主动走上前轻声搭话",next:"meet1",love:12,sense:-3,danger:-5,popup:"❤️ 内心低语：终于等到你主动靠近，我期盼这一刻太久了",barrage:"只想把你牢牢攥在手心"},
+                    {text:"装作视而不见径直路过",next:"cold1",love:-15,sense:5,danger:18,popup:"⚠️ 内心低语：刻意无视我吗？没关系，早晚你只会属于我",barrage:"逃不掉的哦小家伙"},
+                    {text:"羞赧低头放缓脚步",next:"shy1",love:8,sense:0,danger:0,popup:"❤️ 内心低语：这般羞涩模样，实在让人爱不释手",barrage:"太可爱了真想藏起来"},
+                    {text:"驻足停留静静打量对方",next:"chat1",love:10,sense:-2,danger:-3,popup:"❤️ 内心低语：你愿意注视我，便是我最大的欢喜",barrage:"你的目光只许看向我"}
                 ]
             },
             meet1:{
-                title:"温柔搭话",
-                text:"你主动打招呼，姐姐眼底瞬间亮起光芒，声音轻柔得像羽毛拂过心尖：“终于，你愿意理我了。”她一步步靠近，身上淡淡的冷香萦绕在鼻尖，气息温柔却带着不容拒绝的占有欲。",
+                title:"初次温情交谈",
+                text:"你主动开口的瞬间，女子清冷的眉眼瞬间漾开温柔笑意，原本沉静的眼眸瞬间亮起璀璨微光。她缓步朝着你走来，周身萦绕着淡淡清冽香气，说话语调轻柔绵软，每一个字眼都饱含深情，可细微之处依旧藏着不容拒绝的强势占有感。",
                 mood:"mood-love",
                 choices:[
-                    {text:"温柔回应她",next:"talk2",love:15,sense:-4,danger:2,popup:"❤️ 姐姐内心：你的声音好温柔，我想一辈子听你说话。"},
-                    {text:"保持距离",next:"cold2",love:-10,sense:4,danger:12,popup:"⚠️ 姐姐内心：你在躲我？别害怕，我不会伤害你，只会永远陪着你。"},
-                    {text:"询问她的名字",next:"chat2",love:10,sense:-2,danger:0,popup:"❤️ 姐姐内心：你想知道我的名字？你开始在意我了，真好。"}
+                    {text:"温柔回应她的话语",next:"talkA",love:15,sense:-4,danger:2,popup:"❤️ 内心低语：你的声音温润动听，余生我都想细细聆听",barrage:"好想一直陪着你"},
+                    {text:"刻意拉开彼此距离",next:"coldA",love:-10,sense:4,danger:12,popup:"⚠️ 内心低语：刻意疏远我吗？心底隐隐泛起酸涩",barrage:"不要离开我好不好"},
+                    {text:"礼貌询问对方来历",next:"chatA",love:10,sense:-2,danger:0,popup:"❤️ 内心低语：你开始想要了解我，这便是最好的开始",barrage:"我的一切都告诉你"},
+                    {text:"简单寒暄后准备离开",next:"leaveA",love:-8,sense:3,danger:10,popup:"⚠️ 内心低语：刚见面就要走吗，我还未曾和你多说几句话",barrage:"再多留一会吧"}
                 ]
             },
             cold1:{
-                title:"刻意回避",
-                text:"你无视她，径直从她身边走过。她脸上的温柔瞬间消失，周身空气骤然变冷。脚步声缓缓跟在你身后，你能感觉到她在盯着你的背影，像锁定猎物的猎手，沉默又危险。",
+                title:"刻意疏离引发寒意",
+                text:"你径直从她身旁走过，没有丝毫停留。女子脸上的温柔笑意骤然消散殆尽，周遭空气温度仿佛骤然下降几分。轻盈的脚步声紧随你的身后，没有急促追赶，却如同无形枷锁紧紧缠绕着你，被人死死紧盯的压抑感扑面而来。",
                 mood:"mood-nervous",
                 choices:[
-                    {text:"回头道歉",next:"talk2",love:5,sense:-2,danger:10,popup:"❤️ 姐姐内心：没关系，我原谅你，只要你回到我身边就好。"},
-                    {text:"加快脚步离开",next:"cold3",love:-20,sense:8,danger:25,popup:"⚠️ 姐姐内心：逃？你觉得你能逃得出我的手掌心吗？"},
-                    {text:"停下不动",next:"shy2",love:3,sense:-1,danger:8,popup:"❤️ 姐姐内心：你停下了，你心里还是有我的。"}
+                    {text:"停下脚步转身致歉",next:"talkA",love:5,sense:-2,danger:10,popup:"❤️ 内心低语：我从来不会怪你，只要你愿意回头就好",barrage:"原谅你的一切任性"},
+                    {text:"加快步伐刻意逃离",next:"coldB",love:-20,sense:8,danger:25,popup:"⚠️ 内心低语：执意想要逃离我？那我只能亲自将你追回",barrage:"越是逃跑越是想困住你"},
+                    {text:"原地驻足不知所措",next:"shyA",love:3,sense:-1,danger:8,popup:"❤️ 内心低语：慌乱无措的样子，实在惹人怜惜",barrage:"别怕我会陪着你"},
+                    {text:"冷漠回头冷眼对视",next:"angryA",love:-18,sense:6,danger:22,popup:"⚠️ 内心低语：这般冷淡眼神，狠狠刺痛我的心",barrage:"别用这种眼神看我"}
                 ]
             },
             shy1:{
-                title:"羞涩反应",
-                text:"你害羞地低下头，脚步不自觉慢了下来。姐姐轻笑一声，慢慢走近，声音里带着笑意：“你真可爱，可爱到……想把你藏起来，只给我一个人看。”",
+                title:"羞涩心动瞬间",
+                text:"你微微低下头颅，脸颊泛起淡淡红晕，行走的脚步也不由自主慢了下来。女子见你这般模样忍不住轻声浅笑，身姿轻盈一步步靠近你，温热的气息缓缓扑面而来，话语里满是宠溺与欢喜，字字句句都在撩拨你的心绪。",
                 mood:"mood-love",
                 choices:[
-                    {text:"抬头看她",next:"talk2",love:13,sense:-3,danger:1,popup:"❤️ 姐姐内心：你的眼睛真好看，我想永远沉溺在里面。"},
-                    {text:"更害羞了",next:"shy3",love:7,sense:0,danger:5,popup:"❤️ 姐姐内心：你害羞的模样，是我见过最美的风景。"},
-                    {text:"小声回应",next:"chat2",love:9,sense:-1,danger:0,popup:"❤️ 姐姐内心：你愿意和我说话，我真的好开心。"}
+                    {text:"鼓起勇气抬头对视",next:"talkA",love:13,sense:-3,danger:1,popup:"❤️ 内心低语：你的眼眸清澈干净，一眼便沦陷其中",barrage:"沉溺在你的目光里"},
+                    {text:"愈发羞涩不敢抬头",next:"shyB",love:7,sense:0,danger:5,popup:"❤️ 内心低语：越害羞越是迷人，真想将你拥入怀中",barrage:"害羞的样子太诱人"},
+                    {text:"小声细碎做出回应",next:"chatA",love:9,sense:-1,danger:0,popup:"❤️ 内心低语：细碎软糯的声音，直击我的心底深处",barrage:"喜欢听你小声说话"},
+                    {text:"假装镇定转移视线",next:"coldA",love:-11,sense:4,danger:14,popup:"⚠️ 内心低语：刻意转移目光，难道是在躲避我的心意",barrage:"不许躲开我的视线"}
                 ]
             },
             chat1:{
-                title:"好奇注视",
-                text:"你的目光让她十分满足，她主动走向你，目光紧紧锁着你：“你在看我？那就好好看着，你的世界里，只能有我。”",
+                title:"目光交织心生情愫",
+                text:"你停下脚步静静望着对方，这份直白的注视让女子满心欢喜，她主动迈步走到你的面前，双眼紧紧锁住你的身影，语气带着一丝霸道的温柔，直白诉说着心底暗藏许久的心意，毫不掩饰对你浓烈的好感。",
                 mood:"mood-love",
                 choices:[
-                    {text:"点头认可",next:"talk2",love:16,sense:-5,danger:3,popup:"❤️ 姐姐内心：你承认了，你的世界只能有我一个人。"},
-                    {text:"移开视线",next:"cold2",love:-12,sense:3,danger:15,popup:"⚠️ 姐姐内心：不准移开视线，看着我，只能看着我。"},
-                    {text:"和她聊天",next:"chat2",love:11,sense:-2,danger:-2,popup:"❤️ 姐姐内心：和我聊天吧，把你的一切都告诉我。"}
+                    {text:"默认认同她的话语",next:"talkA",love:16,sense:-5,danger:3,popup:"❤️ 内心低语：你认同我的想法，往后余生你只属于我",barrage:"你的世界只能有我"},
+                    {text:"慌忙收回自己目光",next:"coldA",love:-12,sense:3,danger:15,popup:"⚠️ 内心低语：匆匆移开视线，是在害怕心动吗",barrage:"躲不掉心底的喜欢"},
+                    {text:"主动开启闲聊话题",next:"chatA",love:11,sense:-2,danger:-2,popup:"❤️ 内心低语：愿意和我闲谈碎语，便是最好的开端",barrage:"想和你聊一辈子"},
+                    {text:"敷衍点头不愿深聊",next:"leaveA",love:-13,sense:5,danger:16,popup:"⚠️ 内心低语：敷衍的态度，让我内心无比失落",barrage:"别这样对我好不好"}
                 ]
             },
-            talk2:{
-                title:"温柔深入",
-                text:"你们聊了很多，从日常作息到兴趣爱好，她听得很认真，把你说的每一句话都牢牢记在心里。她的眼底翻涌着浓烈的爱意，温柔的表象之下，是早已疯狂滋生的占有欲。",
+            talkA:{
+                title:"深入闲谈交心",
+                text:"二人渐渐放下拘谨，开始畅谈日常琐事，从平日兴趣爱好，到生活作息习惯，再到内心细碎心事。女子认真倾听你的每一句话，一字一句全部牢牢记在心底，表面温柔和善，内心早已开始规划如何彻底占据你的全部生活。",
                 mood:"mood-love",
                 choices:[
-                    {text:"认真回答所有问题",next:"heartFall",love:20,sense:-6,danger:4,popup:"❤️ 姐姐内心：你把一切都告诉我了，你是我的，完完全全是我的。"},
-                    {text:"有所保留",next:"cold4",love:-8,sense:4,danger:10,popup:"⚠️ 姐姐内心：你对我有所隐瞒？我会知道你的所有秘密。"},
-                    {text:"主动关心她",next:"chat3",love:18,sense:-4,danger:2,popup:"❤️ 姐姐内心：你关心我，你心里是有我的，对不对？"}
+                    {text:"毫无保留诉说心事",next:"deepTalk1",love:20,sense:-6,danger:4,popup:"❤️ 内心低语：你对我毫无防备，这份信任我定会好好珍惜",barrage:"你的心事只讲给我听"},
+                    {text:"有所保留隐瞒心事",next:"coldC",love:-8,sense:4,danger:10,popup:"⚠️ 内心低语：对我心存隐瞒吗？我早晚知晓你所有秘密",barrage:"不要对我有所隐瞒"},
+                    {text:"主动关心她的日常",next:"warmChat1",love:18,sense:-4,danger:2,popup:"❤️ 内心低语：你开始关心我的生活，幸福感瞬间填满心底",barrage:"被你关心太幸福了"},
+                    {text:"闲聊过后准备离去",next:"leaveB",love:-10,sense:4,danger:14,popup:"⚠️ 内心低语：欢乐时光太过短暂，舍不得与你分开",barrage:"好想时间停下来"}
                 ]
             },
-            cold2:{
-                title:"疏离感",
-                text:"你的疏远让她情绪微变，语气冷了几分：“你在怕我？还是……在讨厌我？”她的眼神带着受伤和偏执，危险的气息开始蔓延。",
+            coldA:{
+                title:"隔阂渐渐滋生",
+                text:"你的刻意疏远与冷淡态度，让女子原本温热的心一点点冷却下来，温柔的语气慢慢褪去，眉宇之间染上淡淡的委屈与偏执。她清楚察觉到你内心的防备，心底的不安与占有欲开始悄悄滋生蔓延。",
                 mood:"mood-nervous",
                 choices:[
-                    {text:"解释自己没有",next:"talk3",love:6,sense:-2,danger:8,popup:"❤️ 姐姐内心：我就知道，你不会讨厌我。"},
-                    {text:"沉默不语",next:"cold4",love:-14,sense:5,danger:20,popup:"⚠️ 姐姐内心：沉默就是拒绝，你会付出代价的。"},
-                    {text:"轻声安慰",next:"shy3",love:9,sense:-1,danger:6,popup:"❤️ 姐姐内心：你在安慰我，你对我真好。"}
+                    {text:"主动开口化解尴尬",next:"talkA",love:6,sense:-2,danger:8,popup:"❤️ 内心低语：你主动缓和关系，我所有不悦瞬间消散",barrage:"只要你低头我就原谅"},
+                    {text:"沉默不语不予回应",next:"coldC",love:-14,sense:5,danger:20,popup:"⚠️ 内心低语：沉默便是拒绝，这份冷漠让我倍感煎熬",barrage:"沉默只会让我疯狂"},
+                    {text:"轻声出言安抚情绪",next:"shyB",love:9,sense:-1,danger:6,popup:"❤️ 内心低语：你的安抚是治愈我心绪最好的良药",barrage:"只有你能安抚我"},
+                    {text:"依旧冷淡保持距离",next:"angryB",love:-16,sense:7,danger:24,popup:"⚠️ 内心低语：一而再再而三疏远我，耐心快要耗尽了",barrage:"我的忍耐有限度"}
                 ]
             },
-            chat2:{
-                title:"轻松对话",
-                text:"对话氛围轻松，她对你的好感持续上升，看你的眼神越来越温柔，带着藏不住的笑意和宠溺。",
+            chatA:{
+                title:"轻松惬意闲谈",
+                text:"二人交谈氛围轻松愉悦，没有拘谨没有隔阂，欢声笑语萦绕在四周。女子看向你的眼神愈发温柔缱绻，眼底的宠溺几乎快要溢出来，相处的每一分每一秒，都让她愈发确定不能失去你。",
                 mood:"mood-love",
                 choices:[
-                    {text:"继续聊天",next:"talk3",love:14,sense:-3,danger:1,popup:"❤️ 姐姐内心：和你聊天的每一秒，我都无比珍惜。"},
-                    {text:"提议一起走走",next:"heartFall",love:19,sense:-5,danger:3,popup:"❤️ 姐姐内心：和你并肩行走，是我最幸福的时刻。"},
-                    {text:"说自己要离开",next:"cold4",love:-10,sense:4,danger:14,popup:"⚠️ 姐姐内心：不准走，我还没和你待够。"}
+                    {text:"继续畅谈无话不谈",next:"deepTalk1",love:14,sense:-3,danger:1,popup:"❤️ 内心低语：和你闲谈度日，是世间最幸福的事情",barrage:"只想日日与你闲谈"},
+                    {text:"邀约一同漫步散步",next:"walkChat1",love:19,sense:-5,danger:3,popup:"❤️ 内心低语：能够与你并肩同行，是我梦寐以求的画面",barrage:"并肩走到天荒地老"},
+                    {text:"随口道别准备离开",next:"leaveB",love:-10,sense:4,danger:14,popup:"⚠️ 内心低语：刚刚聊得尽兴就要分开，满心皆是不舍",barrage:"真的不想和你分开"},
+                    {text:"询问她心中想法",next:"heartTalk1",love:12,sense:-2,danger:2,popup:"❤️ 内心低语：你愿意探寻我的心意，我满心欢喜",barrage:"我的心意全是你"}
                 ]
             },
-            shy2:{
-                title:"慌乱无措",
-                text:"你不知所措的样子让她觉得无比珍贵，她轻声安抚你，却悄悄拉近了距离，几乎能感受到她温热的呼吸。",
+            leaveA:{
+                title:"仓促离别心生落寞",
+                text:"你简单寒暄过后便打算转身离开，女子下意识伸出手想要挽留，最后还是缓缓收回。她静静伫立在原地，目光紧紧追随着你的背影，落寞与孤寂瞬间席卷全身，心底的执念开始愈发浓烈。",
+                mood:"mood-sad",
+                choices:[
+                    {text:"于心不忍停下脚步",next:"talkA",love:7,sense:-3,danger:9,popup:"❤️ 内心低语：你终究还是舍不得丢下我独自一人",barrage:"我就知道你舍不得"},
+                    {text:"毅然决然转身离开",next:"coldB",love:-17,sense:6,danger:21,popup:"⚠️ 内心低语：狠心转身离去，这份落寞无人能够体会",barrage:"离开我你会后悔的"},
+                    {text:"回头挥手简单告别",next:"shyA",love:6,sense:-1,danger:7,popup:"❤️ 内心低语：简单挥手道别，也足以慰藉我的心绪",barrage:"期待下次相见"},
+                    {text:"毫无留恋径直走远",next:"angryA",love:-19,sense:8,danger:26,popup:"⚠️ 内心低语：这般毫无留恋，彻底伤透我的真心",barrage:"真心被狠狠践踏"}
+                ]
+            },
+            shyA:{
+                title:"慌乱无措惹人怜惜",
+                text:"你站在原地心神慌乱，手足无措不知道该如何应对眼前的局面。女子看着你这般模样，心中所有不悦尽数消散，只剩下满心的怜惜与疼爱，脚步放轻缓缓靠近你，耐心温柔安抚你的情绪。",
                 mood:"mood-love",
                 choices:[
-                    {text:"慢慢放松",next:"talk3",love:12,sense:-2,danger:2,popup:"❤️ 姐姐内心：你愿意信任我了，真好。"},
-                    {text:"依旧紧张",next:"shy3",love:6,sense:1,danger:7,popup:"❤️ 姐姐内心：别紧张，我会一直陪着你，保护你。"},
-                    {text:"尝试交流",next:"chat3",love:10,sense:-1,danger:0,popup:"❤️ 姐姐内心：你愿意主动和我交流，我太开心了。"}
+                    {text:"慢慢平复紧张心绪",next:"talkA",love:12,sense:-2,danger:2,popup:"❤️ 内心低语：慢慢放松下来吧，我永远不会伤害你",barrage:"安心依靠我就好"},
+                    {text:"依旧紧张局促不安",next:"shyB",love:6,sense:1,danger:7,popup:"❤️ 内心低语：紧张局促的样子，可爱得让人心软",barrage:"慢慢适应我的存在"},
+                    {text:"鼓起勇气主动搭话",next:"warmChat1",love:10,sense:-1,danger:0,popup:"❤️ 内心低语：你主动搭话的瞬间，满心皆是暖意",barrage:"喜欢主动的你"},
+                    {text:"下意识往后微微退让",next:"coldC",love:-9,sense:3,danger:11,popup:"⚠️ 内心低语：下意识退让，还是对我心存防备吗",barrage:"不要再躲避我了"}
                 ]
             },
-            cold3:{
-                title:"逃离意图",
-                text:"你想逃，她瞬间挡在你面前，脸上的笑容彻底消失：“不准逃，你只能留在我身边。”她的眼神冰冷而疯狂，你知道，她说到做到。",
+            coldB:{
+                title:"执意逃离激起偏执",
+                text:"你不顾一切加快脚步逃离，女子再也无法维持从容姿态，快步上前直接挡在你的身前，往日温柔尽数褪去，眉眼之间满是偏执与认真，语气严肃认真，直白告诉你绝对不会放任你离开。",
                 mood:"mood-mad",
                 choices:[
-                    {text:"妥协停下",next:"talk3",love:4,sense:-3,danger:15,popup:"❤️ 姐姐内心：乖，只要你不逃，我什么都愿意给你。"},
-                    {text:"强行绕开",next:"cold5",love:-25,sense:10,danger:30,popup:"⚠️ 姐姐内心：你逼我的，别怪我用极端的方式留住你。"},
-                    {text:"道歉示弱",next:"shy3",love:8,sense:0,danger:12,popup:"❤️ 姐姐内心：没关系，我原谅你，只要你乖乖的。"}
+                    {text:"妥协顺从不再逃离",next:"talkA",love:4,sense:-3,danger:15,popup:"❤️ 内心低语：乖乖顺从就好，我定会倾尽所有宠爱你",barrage:"听话才会被疼爱"},
+                    {text:"执意绕开继续逃跑",next:"coldD",love:-25,sense:10,danger:30,popup:"⚠️ 内心低语：屡次执意逃跑，我已经快要失去耐心了",barrage:"逃跑只会代价更大"},
+                    {text:"放低姿态低头认错",next:"shyB",love:8,sense:0,danger:12,popup:"❤️ 内心低语：低头认错的模样，让我再也无法生气",barrage:"认错我就原谅你"},
+                    {text:"据理力争想要自由",next:"angryB",love:-22,sense:9,danger:27,popup:"⚠️ 内心低语：追求所谓自由？在我身边便是最好归宿",barrage:"自由远远不如我重要"}
                 ]
             },
-            shy3:{
-                title:"温柔靠近",
-                text:"她耐心陪着你，一点点靠近，温柔得让你无法抗拒。她的指尖轻轻擦过你的手背，带来一阵战栗。",
-                mood:"mood-love",
-                choices:[
-                    {text:"接受她的靠近",next:"heartFall",love:17,sense:-4,danger:2,popup:"❤️ 姐姐内心：你接受我了，我们再也不要分开。"},
-                    {text:"轻轻躲开",next:"cold4",love:-9,sense:3,danger:11,popup:"⚠️ 姐姐内心：你躲开了我的触碰，我的心好痛。"},
-                    {text:"安静陪伴",next:"talk3",love:13,sense:-2,danger:1,popup:"❤️ 姐姐内心：这样安静陪着你，也很幸福。"}
-                ]
-            },
-            talk3:{
-                title:"心意渐明",
-                text:"她看着你，眼神认真而坚定：“我喜欢你，喜欢到想把你永远留在身边，谁也不能抢走。”",
-                mood:"mood-love",
-                choices:[
-                    {text:"我也喜欢你",next:"agreeLove",love:25,sense:-8,danger:5,popup:"❤️ 姐姐内心：你也喜欢我！我真的好幸福，好开心！"},
-                    {text:"我需要想想",next:"waitLove",love:10,sense:5,danger:12,popup:"⚠️ 姐姐内心：为什么要想？你应该立刻答应我！"},
-                    {text:"抱歉，我不能",next:"refuseLove",love:-30,sense:10,danger:35,popup:"⚠️ 姐姐内心：拒绝我？你会后悔的，你永远别想离开我。"}
-                ]
-            },
-            chat3:{
-                title:"温馨相处",
-                text:"相处越久，她对你的执念越深，她已经无法接受失去你。她的世界里，你是唯一的光，是她活下去的意义。",
-                mood:"mood-love",
-                choices:[
-                    {text:"愿意和她在一起",next:"agreeLove",love:23,sense:-7,danger:4,popup:"❤️ 姐姐内心：太好了，我们终于可以永远在一起了。"},
-                    {text:"保持朋友关系",next:"waitLove",love:8,sense:4,danger:15,popup:"⚠️ 姐姐内心：朋友？我不要做朋友，我要做你唯一的爱人。"},
-                    {text:"渐渐疏远",next:"cold5",love:-18,sense:6,danger:22,popup:"⚠️ 姐姐内心：疏远我？我不会让你如愿的。"}
-                ]
-            },
-            cold4:{
-                title:"不安加剧",
-                text:"你的冷淡让她不安，她的耐心一点点被消磨，危险气息越来越重，她眼底的温柔被偏执取代。",
-                mood:"mood-nervous",
-                choices:[
-                    {text:"主动缓和",next:"talk3",love:7,sense:-2,danger:10,popup:"❤️ 姐姐内心：你愿意缓和关系，我就知道你舍不得我。"},
-                    {text:"继续冷淡",next:"cold5",love:-22,sense:8,danger:28,popup:"⚠️ 姐姐内心：继续冷淡？那我只能用我的方式留住你了。"},
-                    {text:"温柔道歉",next:"shy3",love:11,sense:-1,danger:8,popup:"❤️ 姐姐内心：没关系，我原谅你，只要你回到我身边。"}
-                ]
-            },
-            cold5:{
-                title:"彻底冷漠",
-                text:"你彻底推开她，她脸上的温柔彻底破碎，只剩下偏执与疯狂。她看着你，眼神里没有温度，只有冰冷的占有欲。",
+            angryA:{
+                title:"冷眼相对心生怨怼",
+                text:"你冷漠的对视与决绝的态度，彻底刺痛了女子柔软的内心。她眼底的温柔彻底褪去，取而代之的是冰冷的失望与浓烈的怨怼，周身危险气息不断升腾，原本纯粹的爱意开始掺杂疯狂的占有欲。",
                 mood:"mood-mad",
                 choices:[
-                    {text:"后悔挽回",next:"talk3",love:5,sense:-4,danger:20,popup:"❤️ 姐姐内心：你后悔了，回来吧，我一直在等你。"},
-                    {text:"坚持远离",next:"refuseLove",love:-35,sense:12,danger:40,popup:"⚠️ 姐姐内心：坚持远离？那我只能把你永远锁在我身边了。"}
+                    {text:"立刻服软主动示好",next:"shyB",love:5,sense:-4,danger:19,popup:"❤️ 内心低语：及时服软示好，我便放下心中所有怨气",barrage:"服软我就既往不咎"},
+                    {text:"依旧强硬不肯退让",next:"coldD",love:-30,sense:11,danger:33,popup:"⚠️ 内心低语：不肯退让分毫，那就只能用手段留住你",barrage:"强硬只会适得其反"},
+                    {text:"沉默低头不再对峙",next:"coldC",love:-12,sense:6,danger:17,popup:"⚠️ 内心低语：沉默低头为时已晚，心底伤痕已然留下",barrage:"伤害已经造成了"},
+                    {text:"主动开口缓和气氛",next:"warmChat1",love:9,sense:-2,danger:13,popup:"❤️ 内心低语：你愿意缓和气氛，我愿意放下所有不悦",barrage:"不想和你闹别扭"}
                 ]
             },
-            waitLove:{
-                title:"犹豫不定",
-                text:"你的犹豫让她又疼又怒，她在耐心与疯狂之间挣扎，眼底的爱意和占有欲几乎要溢出来。",
-                mood:"mood-nervous",
-                choices:[
-                    {text:"最终接受",next:"agreeLove",love:18,sense:-6,danger:8,popup:"❤️ 姐姐内心：你接受我了！我们会永远幸福的！"},
-                    {text:"最终拒绝",next:"refuseLove",love:-32,sense:11,danger:38,popup:"⚠️ 姐姐内心：你还是拒绝了我，那我们就一起坠入深渊吧。"}
-                ]
-            },
-            heartFall:{
-                title:"心意沉沦",
-                text:"夕阳落下，夜幕降临，她将你带到僻静的河畔。晚风轻轻吹动她的发丝，她看着你，目光炽热而疯狂：“我好喜欢你，喜欢你到……可以放弃一切，包括我自己。”",
+            shyB:{
+                title:"温柔贴近渐生依赖",
+                text:"女子放缓所有强势姿态，极致温柔贴近你的身旁，一举一动都满是小心翼翼的呵护。温热的指尖不经意擦过你的肌肤，带来一阵清晰的悸动，在日复一日的温柔相处中，你渐渐对她生出莫名的依赖感。",
                 mood:"mood-love",
                 choices:[
-                    {text:"我愿意",next:"agreeLove",love:30,sense:-10,danger:6,popup:"❤️ 姐姐内心：我愿意！这三个字，是我听过最美的情话！"},
-                    {text:"我需要时间",next:"waitLove",love:12,sense:6,danger:14,popup:"⚠️ 姐姐内心：还要时间？我已经等不及要拥有你了。"},
-                    {text:"我不能接受",next:"refuseLove",love:-28,sense:9,danger:32,popup:"⚠️ 姐姐内心：不能接受？那我就强迫你接受。"}
+                    {text:"坦然接受她的亲近",next:"deepTalk1",love:17,sense:-4,danger:2,popup:"❤️ 内心低语：坦然接受我的亲近，我们早已密不可分",barrage:"彼此依偎永不分离"},
+                    {text:"下意识轻轻闪躲避开",next:"coldC",love:-9,sense:3,danger:11,popup:"⚠️ 内心低语：刻意闪躲我的亲近，内心满是失落难过",barrage:"好想紧紧抱住你"},
+                    {text:"安静相伴无言相处",next:"heartTalk1",love:13,sense:-2,danger:1,popup:"❤️ 内心低语：无言相伴的时光，安静又无比温馨",barrage:"静静陪着你就足够"},
+                    {text:"主动贴近回应温柔",next:"walkChat1",love:15,sense:-3,danger:4,popup:"❤️ 内心低语：你主动回应我的温柔，是世间最美的回应",barrage:"双向奔赴的温柔"}
+                ]
+            },
+            coldC:{
+                title:"隔阂加重爱意扭曲",
+                text:"长久的冷淡与防备，不断消磨着女子心中的温柔与耐心。她再也无法维持平和心态，心底的不安愈发强烈，原本纯粹美好的爱意渐渐开始扭曲变形，偏执的念头在脑海之中疯狂滋生壮大。",
+                mood:"mood-nervous",
+                choices:[
+                    {text:"主动破冰打破僵局",next:"heartTalk1",love:7,sense:-2,danger:10,popup:"❤️ 内心低语：你主动打破僵局，是挽回一切最好的方式",barrage:"别再继续冷落我了"},
+                    {text:"持续冷淡不愿沟通",next:"coldD",love:-22,sense:8,danger:28,popup:"⚠️ 内心低语：拒绝所有沟通交流，只会让我愈发疯狂偏执",barrage:"沉默会彻底逼疯我"},
+                    {text:"满心愧疚出言道歉",next:"shyB",love:11,sense:-1,danger:8,popup:"❤️ 内心低语：你的道歉足以抚平我心中所有委屈",barrage:"你的道歉最管用"},
+                    {text:"态度缓和慢慢相处",next:"warmChat1",love:10,sense:-2,danger:9,popup:"❤️ 内心低语：态度慢慢缓和，一切都还来得及挽回",barrage:"慢慢回到从前就好"}
+                ]
+            },
+            angryB:{
+                title:"耐心耗尽濒临失控",
+                text:"你的一次次疏远、冷漠与反抗，彻底耗尽了女子所有的耐心与包容。她不再刻意掩饰内心的疯狂，眼底情绪翻涌不定，理智渐渐开始失守，只差最后一步，便会彻底陷入无尽的偏执深渊之中。",
+                mood:"mood-mad",
+                choices:[
+                    {text:"心生悔意主动挽回",next:"heartTalk1",love:5,sense:-4,danger:20,popup:"❤️ 内心低语：你终于心生悔意愿意挽回，我一直在等你",barrage:"回头我一直都在"},
+                    {text:"坚守本心绝不妥协",next:"refuseEarly",love:-35,sense:12,danger:40,popup:"⚠️ 内心低语：执意绝不妥协，那我们便一同坠入深渊",barrage:"既然如此那就一起沉沦"},
+                    {text:"害怕慌张选择退让",next:"shyB",love:6,sense:-3,danger:18,popup:"❤️ 内心低语：你心生畏惧选择退让，我会收敛自身戾气",barrage:"别怕我不会伤害你"},
+                    {text:"置之不理无视情绪",next:"coldD",love:-28,sense:10,danger:32,popup:"⚠️ 内心低语：无视我的情绪，只会彻底点燃我的怒火",barrage:"不要无视我的真心"}
+                ]
+            },
+            coldD:{
+                title:"彻底冷漠爱意癫狂",
+                text:"你从头到尾的冷漠拒绝，击碎了女子心中最后一丝温柔幻想。她脸上所有情绪尽数褪去，只剩下极致的冰冷与彻骨的疯狂。她已然下定决心，无论使用何种方式，都要将你牢牢捆绑在自己身边，再也不给你任何逃离的机会。",
+                mood:"mood-mad",
+                choices:[
+                    {text:"幡然醒悟主动求和",next:"heartTalk1",love:5,sense:-4,danger:20,popup:"❤️ 内心低语：你终于醒悟求和，我愿意暂且放下所有执念",barrage:"愿意给你一次机会"},
+                    {text:"坚定不移划清界限",next:"refuseEarly",love:-35,sense:12,danger:40,popup:"⚠️ 内心低语：执意划清界限，那就别怪我不择手段",barrage:"界限只会被我打破"}
+                ]
+            },
+            deepTalk1:{
+                title:"心意相通情愫渐浓",
+                text:"彼此敞开心扉深度交谈过后，二人之间的距离瞬间拉近无数。夕阳缓缓下沉，漫天晚霞染红整片天际，氛围浪漫又缱绻。女子凝视着你的脸庞，积攒许久的浓烈爱意再也无法压抑，直白准备向你吐露告白心声。",
+                mood:"mood-love",
+                choices:[
+                    {text:"静静聆听等待告白",next:"confess1",love:22,sense:-7,danger:5,popup:"❤️ 内心低语：早已迫不及待想要诉说满心爱意",barrage:"藏不住对你的喜欢"},
+                    {text:"提前试探询问心意",next:"heartTalk1",love:14,sense:-3,danger:3,popup:"❤️ 内心低语：你主动试探心意，正好顺势诉说爱慕",barrage:"我的心意全都是你"},
+                    {text:"故作懵懂转移话题",next:"waitLove1",love:9,sense:5,danger:13,popup:"⚠️ 内心低语：故作懵懂转移话题，难免让我心生失落",barrage:"不要假装听不懂呀"},
+                    {text:"察觉心思刻意回避",next:"coldC",love:-12,sense:6,danger:19,popup:"⚠️ 内心低语：刻意回避我的心意，实在让我无比难过",barrage:"不要躲避我的真心"}
+                ]
+            },
+            warmChat1:{
+                title:"温情相伴暖意融融",
+                text:"互相贴心关怀的相处模式，让二人之间满是温馨暖意。女子沉浸在这份安稳幸福之中，愈发离不开你的陪伴，内心深处的占有欲与爱意不断交织融合，既想温柔呵护你，又想独自霸占你的一切。",
+                mood:"mood-love",
+                choices:[
+                    {text:"顺势接受这份温情",next:"confess1",love:23,sense:-7,danger:4,popup:"❤️ 内心低语：接受我的温情，往后余生尽数给你温柔",barrage:"倾尽温柔只对你"},
+                    {text:"维持友情界限相处",next:"waitLove1",love:8,sense:4,danger:15,popup:"⚠️ 内心低语：只想维持友情？我想要的从来不止这些",barrage:"我不甘心只做朋友"},
+                    {text:"慢慢疏远保持距离",next:"coldD",love:-18,sense:6,danger:22,popup:"⚠️ 内心低语：慢慢疏远我，这份温情即将消散殆尽",barrage:"别推开温热的爱意"},
+                    {text:"主动诉说内心好感",next:"confess1",love:21,sense:-6,danger:3,popup:"❤️ 内心低语：你诉说对我的好感，是世间最好的礼物",barrage:"双向好感最为甜蜜"}
+                ]
+            },
+            walkChat1:{
+                title:"并肩漫步晚风叙情",
+                text:"二人并肩行走在晚风之中，沿途风景缓缓向后倒退，耳边只有彼此轻柔的话语与晚风声响。氛围浪漫又静谧，女子借着朦胧夜色，一点点诉说着自己长久以来对你的默默关注与满心欢喜。",
+                mood:"mood-love",
+                choices:[
+                    {text:"满心欢喜欣然接纳",next:"confess1",love:24,sense:-8,danger:5,popup:"❤️ 内心低语：你欣然接纳我的心意，此生无别所求",barrage:"此生只为你倾心"},
+                    {text:"内心纠结犹豫不决",next:"waitLove1",love:11,sense:5,danger:14,popup:"⚠️ 内心低语：犹豫不决的模样，让我内心焦灼不安",barrage:"快点做出选择吧"},
+                    {text:"委婉拒绝这份心意",next:"refuseEarly",love:-26,sense:8,danger:29,popup:"⚠️ 内心低语：委婉拒绝心意，晚风都变得冰冷刺骨",barrage:"拒绝让我满心伤痛"},
+                    {text:"享受当下不谈感情",next:"waitLove1",love:10,sense:6,danger:12,popup:"❤️ 内心低语：享受当下美好时光，感情之事可以慢慢等候",barrage:"慢慢来我愿意等"}
+                ]
+            },
+            heartTalk1:{
+                title:"探寻心底真挚情意",
+                text:"你主动探寻她内心真实想法，女子不再有任何隐瞒，将自己长久以来压抑在心底的爱慕、执念、欢喜与不安尽数诉说出来。她告诉你从初见那一刻起，目光就再也无法从你的身上移开分毫。",
+                mood:"mood-love",
+                choices:[
+                    {text:"深受触动心生爱意",next:"confess1",love:25,sense:-8,danger:5,popup:"❤️ 内心低语：你被我的真心打动，一切等待都值得",barrage:"真心终究能够打动你"},
+                    {text:"心生感动依旧犹豫",next:"waitLove1",love:10,sense:5,danger:12,popup:"⚠️ 内心低语：心生感动却依旧犹豫，我还需要继续努力",barrage:"我会一直耐心等候"},
+                    {text:"理性看待保持清醒",next:"waitLove1",love:7,sense:7,danger:16,popup:"⚠️ 内心低语：太过理性看待感情，会错过满心真挚爱意",barrage:"感情无需太过理智"},
+                    {text:"直言无法回应感情",next:"refuseEarly",love:-30,sense:10,danger:35,popup:"⚠️ 内心低语：直言无法回应，彻底击碎我的满心期盼",barrage:"期盼一瞬间化为泡影"}
+                ]
+            },
+            waitLove1:{
+                title:"犹豫徘徊进退两难",
+                text:"你的犹豫不决、徘徊不定，让女子陷入极致的煎熬之中。一边是满心不舍不愿逼迫你，一边是汹涌爱意难以克制，她就在温柔包容与疯狂偏执的边缘不断挣扎游走，情绪反复起伏难以安稳。",
+                mood:"mood-nervous",
+                choices:[
+                    {text:"思虑过后下定决心接受",next:"agreeLove",love:18,sense:-6,danger:8,popup:"❤️ 内心低语：终于下定决心接受我，所有煎熬全都值得",barrage:"苦尽甘来终得圆满"},
+                    {text:"反复思虑最终选择拒绝",next:"refuseLove",love:-32,sense:11,danger:38,popup:"⚠️ 内心低语：思虑过后依旧拒绝，最后一丝希望彻底破灭",barrage:"最后希望彻底消失"}
+                ]
+            },
+            refuseEarly:{
+                title:"前期拒绝埋下隐患",
+                text:"早早直白拒绝她的心意，让女子心中最后一丝柔软彻底消失。她不再抱有任何美好幻想，心中爱意彻底转化为浓烈的占有执念，已经暗中做好一切准备，势必要将你牢牢留在自己身边。",
+                mood:"mood-mad",
+                choices:[
+                    {text:"事后后悔想要挽回",next:"heartTalk1",love:6,sense:-5,danger:23,popup:"❤️ 内心低语：知道后悔想要挽回，我依旧愿意接纳你",barrage:"回头永远不算太晚"},
+                    {text:"坚持初衷绝不回头",next:"refuseLove",love:-36,sense:13,danger:43,popup:"⚠️ 内心低语：坚持初衷绝不回头，那就只能动用所有手段",barrage:"执意如此便别无选择"}
+                ]
+            },
+            confess1:{
+                title:"暮色之下深情告白",
+                text:"漫天晚霞铺满整片天空，温柔晚风轻轻吹拂发丝，女子停下所有话语，目光无比认真深情地望向你，酝酿许久的告白话语缓缓说出，字字句句皆是发自肺腑，饱含极致浓烈又带着偏执的爱意。",
+                mood:"mood-love",
+                choices:[
+                    {text:"坦然接受答应在一起",next:"agreeLove",love:30,sense:-10,danger:6,popup:"❤️ 内心低语：你答应和我在一起，是这辈子最幸福的事情",barrage:"余生只想与你相守"},
+                    {text:"委婉推辞需要时间",next:"waitLove1",love:12,sense:6,danger:14,popup:"⚠️ 内心低语：还需要时间考量，我愿意倾尽所有耐心等待",barrage:"多久我都愿意等你"},
+                    {text:"狠心直言拒绝告白",next:"refuseLove",love:-28,sense:9,danger:32,popup:"⚠️ 内心低语：狠心拒绝我的告白，我的世界瞬间失去色彩",barrage:"我的世界瞬间灰暗"}
                 ]
             },
             agreeLove:{
-                title:"确认关系",
-                text:"你接受了她，她激动地抱住你，力道紧得让你无法呼吸，仿佛要把你揉进自己的骨血里。她在你耳边轻声呢喃：“你是我的，永远都是。”",
+                title:"确定恋人专属关系",
+                text:"你点头应允答应和她在一起的瞬间，女子瞬间激动不已，不顾一切用力将你紧紧拥入怀中，拥抱的力道浓烈又急切，仿佛害怕下一秒你就会消失不见。在你耳边轻声呢喃着无数情话，诉说着往后余生相守相伴的心愿。",
                 mood:"mood-love",
                 choices:[
-                    {text:"全心依赖她",next:"ending4",love:35,sense:-15,danger:5,popup:"❤️ 姐姐内心：你依赖我，真好，我会永远守护你，宠爱你。"},
-                    {text:"想要私人空间",next:"ending1",love:-20,sense:10,danger:25,popup:"⚠️ 姐姐内心：私人空间？你想离开我？不可能。"},
-                    {text:"享受甜蜜",next:"ending2",love:20,sense:-12,danger:18,popup:"❤️ 姐姐内心：我们会一直甜蜜下去，直到永远。"}
+                    {text:"全身心依赖依偎着她",next:"ending4",love:35,sense:-15,danger:5,popup:"❤️ 内心低语：全身心依赖我的模样，让我满心满足欢喜",barrage:"永远做被我宠爱的小孩"},
+                    {text:"希望保留私人独立空间",next:"ending1",love:-20,sense:10,danger:25,popup:"⚠️ 内心低语：想要私人空间？心底难免生出不安与猜忌",barrage:"害怕距离冲淡爱意"},
+                    {text:"沉浸甜蜜享受恋爱",next:"ending2",love:20,sense:-12,danger:18,popup:"❤️ 内心低语：一同沉浸甜蜜爱恋，岁岁年年永不分离",barrage:"沉溺在甜蜜爱恋之中"},
+                    {text:"理性相处保持分寸感",next:"endingMid1",love:12,sense:-5,danger:11,popup:"❤️ 内心低语：理性相处安稳度日，细水长流亦是幸福",barrage:"细水长流安稳相守"}
                 ]
             },
             refuseLove:{
-                title:"拒绝告白",
-                text:"你拒绝了她，她所有温柔瞬间消失，眼神变得冰冷而疯狂。她笑了，笑声里带着绝望和偏执：“你以为，你能逃得掉吗？”",
+                title:"狠心拒绝彻底决裂",
+                text:"你狠心拒绝她倾尽所有的深情告白，女子脸上所有甜蜜笑意尽数消散，温柔彻底碎裂，取而代之的是刺骨的冰冷与彻骨的疯狂。低沉的笑声在寂静晚风之中响起，带着无尽绝望与偏执，宣告着一切温柔就此终结。",
                 mood:"mood-mad",
                 choices:[
-                    {text:"逃跑",next:"ending3",love:-25,sense:8,danger:42,popup:"⚠️ 姐姐内心：逃跑？你跑得再远，我也会把你找回来。"},
-                    {text:"坚持拒绝",next:"ending5",love:-40,sense:15,danger:50,popup:"⚠️ 姐姐内心：坚持拒绝？那我只能用最极端的方式，把你永远留在我身边。"}
+                    {text:"心生畏惧慌忙逃离",next:"ending3",love:-25,sense:8,danger:42,popup:"⚠️ 内心低语：心生畏惧慌忙逃跑，可你根本无处可逃",barrage:"天涯海角都能找到你"},
+                    {text:"态度强硬坚守立场",next:"ending5",love:-40,sense:15,danger:50,popup:"⚠️ 内心低语：态度强硬坚守立场，那就只能将你彻底禁锢",barrage:"强硬只会换来彻底禁锢"},
+                    {text:"内心不安面露悔意",next:"endingMid2",love:-15,sense:9,danger:34,popup:"❤️ 内心低语：面露悔意心生不安，我还愿意给你最后机会",barrage:"后悔就还有挽回余地"}
                 ]
             },
 
             senseFailBE:{
-                title:"坏结局·意识消散",
-                text:"你的理智彻底崩溃，再也无法反抗，只能乖乖待在她身边，成为她唯一的所有物。你的思想、情绪、判断全部被她慢慢同化，你不再拥有自我，眼里只剩下她的身影。你温顺、听话、依赖，彻底沉沦在她温柔又病态的爱意牢笼之中，再也无法清醒。",
+                title:"坏结局·意识沉沦同化",
+                text:"长久沉浸在她极致温柔又病态的呵护之中，你的自我意识一点点被慢慢同化瓦解。原本清晰的思绪逐渐变得混沌模糊，独立的思想与判断能力尽数消散，再也无法拥有自己的主见与想法。你变得温顺乖巧言听计从，彻底沦为只属于她一人的附属品，余生岁月都将被困在这份温柔牢笼之中，永远失去自我。",
                 mood:"mood-dark",
-                diary:"【姐姐的极致爱意日记】\n夜深了，我的小孩安静靠在我怀里。我抚摸你柔软的发丝，看着你空洞却乖巧的眼神，心底满是满足与狂喜。我知道我很自私，我毁掉了你的理智、你的思考、你的自由，可我控制不住自己。从第一眼看见你的那一刻，我就注定要把你占为己有，注定要把你锁在我身边。我不需要你聪明，不需要你独立，不需要你拥有除我之外的任何情绪。你只要乖乖依赖我、信任我、粘着我就够了。你的理智消散没关系，你的思想交给我就好，你的人生由我来掌控。我会永远温柔抱着你，给你最好的一切，哪怕这份温柔沾满自私与罪孽。你是我的，从头到脚，从里到外，都是我的，永远逃不掉，永远别想离开。",
-                choices:[{text:"重新开始游戏",next:"restartGame"}]
+                diary:"【沉沦同化爱意手记】\n静谧深夜之中，我轻轻抱着已然失去自我意识的你，指尖缓缓轻抚你的眉眼与发丝，心底涌动着极致的满足与安稳。我清楚知晓是我一点点磨灭了你所有的棱角与思想，是我亲手夺走了你本该拥有的自由与独立，可我从来没有半分后悔之意。从遇见你的那一瞬间开始，我就早已下定决心，要将你完完整整拥入怀中，让你的世界之中只剩下我的身影。我不需要你拥有独立的思绪，不需要你拥有繁杂的想法，更不需要你接触外界纷扰繁杂的人和事。你只需要安安静静依偎在我的怀中，乖乖听从我的话语，满心满眼依赖着我就足够了。你的理智消散无关紧要，你的人生道路由我亲自为你规划铺展，你的喜怒哀乐全部由我来掌控支配。这份沾满私心与偏执的温柔，我会日复一日年复一年尽数给予你，生生世世永不停歇。你完完全全属于我，从前是，现在是，往后生生世世，永远都只会是我一个人的所有物，没有任何人能够抢夺，没有任何事情能够改变。",
+                choices:[{text:"重新开启全新剧情",next:"restartGame"}]
             },
             dangerExtremeBE:{
-                title:"坏结局·永恒囚笼",
-                text:"她彻底失控，将你永远禁锢。封闭的房间、隔绝的门窗、无人知晓的角落。这里没有外界、没有他人、没有逃离。她把所有疯狂全部释放，用最偏执的方式将你锁住。你明白，从今往后，你属于她一个人，直到生命尽头，再也没有任何机会离开。",
+                title:"坏结局·无尽永恒囚笼",
+                text:"一次次的反抗、逃离与拒绝，彻底点燃了她心底积攒已久的疯狂怒火。她不再克制压抑自身所有偏执本性，动用所有办法将你彻底禁锢在与世隔绝的密闭空间之内。隔绝外界所有消息，切断你一切社交联系，封锁所有能够离开的出路，从此往后世间喧嚣与你再无半点关系，你只能终日与她相伴，被困在这座用爱意搭建起来的永恒囚笼之中，永世不得脱身。",
                 mood:"mood-mad",
-                diary:"【姐姐的极致爱意日记】\n你总是不懂我的爱，总是一次次推开我，一次次想要逃离。我一次次忍让，一次次克制，努力温柔、努力包容、努力做一个正常的爱人。可你偏偏要反抗、要逃离、要躲开我的视线。那我只能把你关起来，用这种最极端的方式留住你。这间屋子安静、温暖、与世隔绝，没有人能打扰我们，没有人能把你从我身边抢走。我会给你最好的一切，美食、温暖、拥抱、无尽的宠爱，唯独不给你自由。自由是最奢侈、最危险的东西，我不能让你拥有，我不能冒着失去你的风险。别恨我，宝贝。我只是太过爱你，爱到无法容忍你离开我半步，爱到愿意为你背负一切骂名。这是我给你的，永恒的爱囚，是我对你最深沉、最偏执的爱意。",
-                choices:[{text:"重新开始游戏",next:"restartGame"}]
+                diary:"【永恒囚笼偏执情书】\n我曾经无数次压下心中疯狂念头，收敛自身偏执性情，用尽全部耐心温柔包容你的一切小脾气，迁就你的所有想法，只期盼你能够心甘情愿留在我的身边，与我安稳相守共度余生。可你偏偏一次次无视我的真心，一次次想方设法逃离我的身边，一次次肆意践踏我满腔炙热的爱意。万般无奈之下，我只能选择用这种最为极端的方式，将你牢牢留在我的身旁。这间安静密闭的小屋，隔绝了世间所有喧嚣与纷扰，没有旁人打扰我们二人独处的时光，没有外人妄图将你从我身边夺走。我会为你准备精致可口的三餐美食，为你打理好生活之中所有琐碎事宜，给予你无微不至的贴心照料，把世间所有美好的事物全都送到你的面前，唯独唯独不会给予你半分追寻自由的机会。自由是这世间最虚无缥缈又最为危险的东西，我绝对不会冒险让你触碰分毫。或许你此刻心中满是怨恨与不满，或许你满心皆是不甘与委屈，可我从来都不会有半分愧疚之心。我所做的一切所作所为，全部都是源于我对你深入骨髓、深入灵魂的极致深爱。请你慢慢习惯这里的生活，慢慢习惯身边只有我的日子，慢慢接受这份带着枷锁与束缚的浓烈爱意。此生此世，你再也没有任何逃离的可能，只能永远留在我的身边，陪着我，守着我，直至生命走到尽头。",
+                choices:[{text:"重新开启全新剧情",next:"restartGame"}]
             },
-
             ending1:{
-                title:"结局一：阴翳守望",
-                text:"你选择离开，她没有强留，只是默默看着你。她不会打扰你的生活，却会永远跟在你身后，注视你的每一刻，守护你的每一天。你以为自由了，却不知道，你的世界始终被她笼罩。她记得你的作息，记得你的路线，记得你所有喜好。她不会出现，却无处不在。街角、楼下、路口、阴影，永远有一道深情又阴郁的目光凝视着你。你活在阳光之下，她藏在黑暗之中，默默守护，默默执念，永不放手。",
+                title:"结局一：暗影随行默默守望",
+                text:"相恋之后你依旧执着想要拥有属于自己的私人空间，不愿被过度的爱意束缚捆绑。她万般无奈之下选择妥协退让，尊重你的想法放手让你奔赴属于自己的生活与天地。可她从来没有真正放下对你的执念，从此化作隐匿在黑暗之中的影子，从不轻易出面打扰你的日常起居，却时时刻刻关注着你的一举一动，你的行程轨迹、喜怒哀乐、人际交往全都尽数掌握在她的手中，如同暗夜守护者一般，无声无息陪伴在你身旁，此生永不远离。",
                 mood:"mood-sad",
-                diary:"【姐姐的守望爱意日记】\n今天你离开了我，选择去追寻你想要的自由。我没有挽留，哪怕心脏痛到抽搐，指尖颤抖到无法控制。我知道你渴望自由，我知道你讨厌束缚，那我放你走，把阳光、人群、喧闹全部还给你。而我，只需要留在黑暗里，默默看着你就够了。我记下你回家的时间、吃饭的口味、走路的步伐、微笑的弧度，收藏你掉落的发丝、喝过的水杯、无意间留下的所有痕迹。我不会打扰你的生活，不会让你感到厌烦，不会出现在你面前给你压力。只要你好好活着，只要我能看见你，只要你平安快乐，我就满足。世人都说爱是占有，可我愿意把占有藏在阴影里。你是天上耀眼的月亮，而我，是永远追随你的黑影，永不靠近，永不离开，永生永世，默默守护你。",
-                choices:[{text:"重新开始游戏",next:"restartGame"}]
+                diary:"【暗影守望深情告白】\n我最终还是选择顺从你的心意，亲手放你奔赴洒满阳光的广阔天地，让你尽情追寻自己向往的自由生活，不再用浓烈的爱意束缚你的脚步，不再用偏执的心思捆绑你的人生。世人都以为放手便是放下爱意，可只有我自己内心清楚，放手从来都不代表忘记，退让也从来都不代表割舍。我甘愿褪去所有光鲜模样，独自藏匿在阴暗寂静的角落之中，默默注视着阳光下无忧无虑生活的你。我悄悄记下你每日出行的时间路线，熟记你所有饮食喜好与生活习惯，悄悄收集一切与你相关的细碎物件，将对你的满腔爱意小心翼翼珍藏在心底深处，不敢轻易表露半分。我克制住所有想要奔赴你身边的冲动，忍住所有想要拥你入怀的念想，只愿你能够过得安稳顺遂、平安喜乐。你尽情奔赴属于你的璀璨人生就好，不必顾虑身后的我，不必牵挂暗处的我。你是高悬于夜空之中皎洁明亮的明月，耀眼夺目万众瞩目，而我便是永远追随明月前行的无边暗影，不求并肩同行，不求朝夕相伴，只求能够远远望着你，护你一世安稳，伴你岁岁年年，永生永世不离不弃。",
+                choices:[{text:"重新开启全新剧情",next:"restartGame"}]
             },
             ending2:{
-                title:"结局二：专属挚爱",
-                text:"你接受了她的全部，她把你宠成世界上最幸福的人。她为你拒绝所有异性，为你安排好一切，把所有温柔都给你。她的世界只有你，她也要求你的世界只有她。你们结婚，拥有小家，温馨又封闭。她包揽所有琐事，照顾你的衣食住行，把你呵护成无法离开她的小孩。偏执、温柔、占有、宠溺交织在一起，你被困在甜蜜的牢笼里，心甘情愿，永不离开。",
+                title:"结局二：甜蜜牢笼专属挚爱",
+                text:"你心甘情愿沉浸在她极致浓烈的爱意之中，坦然接受她所有的占有欲与小偏执。二人组建起温馨又封闭的二人小家，她包揽生活之中所有大小琐事，将你细致入微呵护照料，把你宠成无忧无虑无需操劳任何事情的模样。她主动疏远身边所有异性朋友，断绝一切多余社交往来，她的世界之中唯独只剩下你一人，同时也希望你的满心满眼之中，也只能容纳下她的身影，二人沉溺在甜蜜又带着束缚的爱恋之中，心甘情愿相守一生。",
                 mood:"mood-love",
-                diary:"【姐姐的专属爱意日记】\n我们结婚了，红色的证书，温暖的小屋，属于我们两个人的完美世界。我终于完完全全拥有你，终于可以把你藏在我身边，一辈子不分开。我会为你做饭、为你洗衣、为你处理所有麻烦，为你挡住世间所有风雨。你不需要接触复杂的人群，不需要面对世俗的恶意，不需要承受任何委屈。有我在，你永远都是被宠爱的小孩。代价是——你的一切只能属于我，你的目光只能看着我，你的心只能装着我。我贪恋你的呼吸、你的体温、你的依赖，我承认我自私、偏执、占有欲爆棚。可我愿意把世间最温柔、最美好的一切全部赠予你。甜蜜的枷锁最是牢固，温柔的牢笼最是难挣脱。愿你永远留在我怀里，做我一辈子的专属挚爱，永生永世，只属于我一个人。",
-                choices:[{text:"重新开始游戏",next:"restartGame"}]
+                diary:"【专属挚爱甜蜜心语】\n能够完完全全拥有你的真心，能够日日朝夕与你相伴相守，是我这辈子最大的幸运与幸福。拥有专属我们二人的温馨小家之后，我便下定决心，倾尽自己一生所有，把世间所有极致温柔与万般宠爱全都毫无保留悉数赠予你。家中大小繁杂琐事全部交由我一人打理，衣食住行方方面面我都会安排得妥妥当当，你只需要安心享受安稳幸福的生活，无忧无虑肆意欢笑就足够了。我主动斩断身边所有多余的人际关系，拒绝一切无关异性的靠近与搭讪，我的世界从此清空所有多余之人，自始至终从头到尾，仅仅只剩下你这一个独一无二的心上人。当然我也由衷期盼，在你的内心深处，也能够同样将所有无关之人尽数剔除，让我成为你心中唯一的偏爱与例外。我坦然承认自己生性自私偏执，占有欲强盛到极致，可这份偏执与自私，仅仅只针对你一人而已。我为你打造的这份爱恋看似带着无形的枷锁，实则里面填满了数不尽的温柔与甜蜜。愿你永远沉醉在这份专属爱恋之中，安心做我一辈子独一份的心头挚爱，岁岁年年长相厮守，生生世世永不分离。",
+                choices:[{text:"重新开启全新剧情",next:"restartGame"}]
             },
-            ending3:{
-                title:"结局三：温柔囚爱",
-                text:"你逃跑失败，被她轻轻带回。她没有责怪、没有发怒、没有呵斥。她只是温柔抱住颤抖的你，一遍又一遍告诉你不要害怕。她隔绝外界所有诱惑，断掉你的社交，封闭你的出行。她给你柔软的床铺、温暖的灯光、无限的陪伴。温柔是她的锁链，宠溺是她的牢笼。你明明被囚禁，却沉溺在她温柔的爱意里，慢慢妥协，慢慢依赖，再也不想逃离。",
-                mood:"mood-mad",
-                diary:"【姐姐的温柔囚爱日记】\n你逃跑的那一刻，我的心跳几乎停止，恐惧吞噬了我的全部理智，我害怕再也见不到你，害怕永远失去你。所以我把你带回来了，别怕，我不会伤害你，不会责怪你，只会给你更多的温柔与宠爱。我给你温暖、给你拥抱、给你一切你想要的温柔，给你一个安全又温暖的港湾。只是，我再也不会允许你离开我身边，再也不会给你逃跑的机会。外面的世界太嘈杂、太危险、太肮脏，只有我这里，才是你最安全的归宿。哪怕方式极端，哪怕爱意扭曲，我只想把你好好藏起来，只属于我一个人。我会用一辈子的温柔，弥补这份禁锢带来的不安，用一辈子的爱意，把你宠成最幸福的人。我爱你，爱到愿意背负一切骂名，爱到愿意为你放弃全世界。",
-                choices:[{text:"重新开始游戏",next:"restartGame"}]
-            },
-            ending4:{
-                title:"结局四：双向救赎",
-                text:"你用真心融化她的偏执，她用爱意守护你的余生。她收敛疯狂，学会尊重；你放下不安，全心信任。你们彼此治愈，彼此依靠。她不再极端，你不再害怕。毕业后你们顺利结婚，不久生下一个乖巧可爱的女儿。她把所有温柔都留给你和孩子，一家人安稳幸福，甜蜜相守，成为了彼此生命中最珍贵的光。",
-                mood:"mood-love",
-                diary:"【姐姐的救赎爱意日记】\n因为你，我变成了更好的人。我收起了锋利的棱角，压下了疯狂的执念，学会了温柔，学会了尊重，学会了用正常、健康的方式去爱你。你治愈了我残缺不安的灵魂，你是我黑暗生命里唯一的光，是我活下去的全部意义。我会用最温柔的方式爱你，用最坚定的心守护你，用一辈子的时间陪伴你。我们的爱不是束缚，不是占有，不是囚禁，而是救赎，是陪伴，是一辈子的不离不弃，是双向奔赴的美好。谢谢你来到我身边，谢谢你愿意爱我，谢谢你治愈了我。往后余生，风雪是你，平淡是你，温柔是你，幸福是你。我会永远爱你，守护你，和你一起，看着我们的孩子长大，一起走完这一生，下辈子，下下辈子，我还要和你在一起。",
-                choices:[{text:"重新开始游戏",next:"restartGame"}]
-            },
-            ending5:{
-                title:"结局五：极致占有",
-                text:"你坚决拒绝她，彻底击碎了她最后的理智。她不择手段拆散你身边所有人，折断你所有退路，用最疯狂、最偏执的方式将你完全占有。她爱你爱到病态，爱到疯狂，爱到愿意为你毁掉全世界，也愿意为你，把你永远锁在身边，成为她唯一的、永恒的所有物。",
-                mood:"mood-mad",
-                diary:"【姐姐的极致占有日记】\n你是我的，只能是我的，从头到脚，从里到外，永生永世，只能属于我一个人。任何人都不能碰，任何人都不能抢，任何人都不能靠近你半步。我为你拒绝全世界，为你放弃所有社交，为你变得偏执疯狂，为你愿意坠入深渊。你可以恨我，可以怨我，可以讨厌我，可以骂我病态，但绝对不能离开我，绝对不能爱上别人。我会折断你的翅膀，断掉你的退路，隔绝你的所有社交，毁掉你身边的一切，只留下我一个人。我爱你爱到病态，爱到疯狂，爱到失去理智，爱到愿意为你付出一切，哪怕是生命，哪怕是罪孽。你是我的命，是我的光，是我的一切，是我永生永世都不会放手的唯一。这辈子，下辈子，下下辈子，你都只能是我的，永远别想逃离。",
-                choices:[{text:"重新开始游戏",next:"restartGame"}]
-            }
-        };
-
-        function restartGame(){
-            loveValue=50; senseValue=60; dangerValue=30;
-            currentScene="start"; updateScene();
-        }
-
-        function updateScene(){
-            const s = scenes[currentScene];
-            document.body.className = s.mood;
-            document.getElementById("title").innerText = s.title;
-            document.getElementById("text").innerText = s.text + (s.diary ? "\n\n"+s.diary : "");
-            updateHeartAnimation();
-
-            let box = document.getElementById("choices");
-            box.innerHTML = "";
-            s.choices.forEach(c=>{
-                let b = document.createElement("button");
-                b.className = c.next=="restartGame" ? "choice-btn end-btn" : "choice-btn";
-                b.innerText = c.text;
-                b.onclick = ()=>{
-                    if(c.love!==undefined) loveValue=Math.max(0,Math.min(100,loveValue+c.love));
-                    if(c.sense!==undefined) senseValue=Math.max(0,Math.min(100,senseValue+c.sense));
-                    if(c.danger!==undefined) dangerValue=Math.max(0,Math.min(100,dangerValue+c.danger));
-
-                    if(c.popup){ pendingScene=c.next; showPopup(c.popup); }
-                    else{ currentScene=c.next; updateScene(); }
-                };
-                box.appendChild(b);
-            });
-        }
-
-        window.onload=()=>{ updateScene(); }
-    </script>
-</body>
-</html>
+            endingMid1:{
+                title:"中间结局：分寸相守平淡余生",
+                text:"二人确定恋爱关系之后，彼此都保持着恰到好处的相处分寸，既有甜蜜温情的相伴时光，也留有各自独立的私人空间。她慢慢收敛自身过于偏激的占有欲，学着用平和理智的方式去珍惜呵护这份感情，你也慢慢放下心中所有防备，真心实意接纳她的爱意。没有极致疯狂的束缚，也没有疏离冷淡的隔阂，二人细水长流平淡相守，安稳度过往后岁岁年年。",
+                mood:"mood-normal",
+                diary:"【分寸相守平淡爱意】\n经历诸多情绪波折与内心挣扎之后，我终于学会收敛心底过于汹涌的偏执与占有欲，明白真正长久的爱恋从来都不是强行捆绑与独自霸占，而是彼此包容互相体谅，留有合适的相处距离。我学着尊重你的想法与喜好，给你足够的自由空间，不再时时刻刻想要将你禁锢在身旁；也慢慢学会调整自己的心态，用平和温柔的心态对待这份来之不易的感情。而你也彻底放下心中所有的不安与防备，坦然接纳我所有的优缺点，真心实意回应我
