@@ -75,14 +75,14 @@
         .mood-love {background:#160707;}
         .love-word{color:#ff7777;font-weight:bold;margin-top:15px;line-height:2}
 
-        /* 弹出画面样式 */
+        /* 弹出画面样式（修复版） */
         .popup {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.85);
+            background: rgba(0,0,0,0.9);
             display: none;
             align-items: center;
             justify-content: center;
@@ -139,9 +139,12 @@
         let currentScene = "start";
         let pendingScene = null;
 
-        // 弹出画面
+        // 弹出画面（修复：强制更新文字，避免空文本卡住）
         function showPopup(text) {
-            document.getElementById("popupText").innerText = text;
+            const popupTextEl = document.getElementById("popupText");
+            if (popupTextEl) {
+                popupTextEl.innerText = text || "";
+            }
             document.getElementById("popup").classList.add("show");
         }
         function closePopup() {
@@ -314,6 +317,11 @@
 
         function updateScene() {
             const scene = scenes[currentScene];
+            const bodyBg = document.getElementById("bodyBg");
+            const titleDom = document.getElementById("title");
+            const textDom = document.getElementById("text");
+            const choicesDom = document.getElementById("choices");
+
             bodyBg.className = scene.mood;
             titleDom.textContent = scene.title;
             if (scene.loveEnding) {
@@ -331,7 +339,10 @@
             });
         }
 
-        updateScene();
+        // 页面加载完成后初始化
+        window.onload = function() {
+            updateScene();
+        }
     </script>
 </body>
 </html>
