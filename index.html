@@ -20,26 +20,6 @@
             position: relative;
             overflow-x: hidden;
         }
-        .text-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 999;
-            overflow: hidden;
-        }
-        .text-overlay span {
-            position: absolute;
-            font-size: 17px;
-            font-weight: bold;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-            white-space: nowrap;
-        }
-        .text-overlay.red { color: #ff3a3a; text-shadow:0 0 6px #ff2222; }
-        .text-overlay.black { color: #000; text-shadow:0 0 4px #440000; }
         .game-container {
             max-width: 620px;
             width: 100%;
@@ -94,10 +74,61 @@
         .mood-sad {background:#0d0606;}
         .mood-love {background:#160707;}
         .love-word{color:#ff7777;font-weight:bold;margin-top:15px;line-height:2}
+
+        /* 弹出画面样式 */
+        .popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 20px;
+        }
+        .popup.show {
+            display: flex;
+        }
+        .popup-box {
+            background: #1b0b0b;
+            border: 2px solid #ff5555;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 100%;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 0 30px #ff000066;
+        }
+        .popup-text {
+            font-size: 18px;
+            color: #ff8888;
+            line-height: 2;
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+        .popup-close {
+            padding: 12px 30px;
+            background: #ff4444;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body id="bodyBg">
-    <div class="text-overlay" id="textOverlay"></div>
+    <!-- 弹出画面 -->
+    <div class="popup" id="popup">
+        <div class="popup-box">
+            <div class="popup-text" id="popupText"></div>
+            <button class="popup-close" onclick="closePopup()">继续阅读</button>
+        </div>
+    </div>
+
     <div class="game-container">
         <h1 class="scene-title" id="title"></h1>
         <p class="scene-text" id="text"></p>
@@ -105,265 +136,201 @@
     </div>
 
     <script>
-        const sickTexts = {
-            redLove: [
-                "满心满眼皆是你",
-                "此生只想独占你",
-                "余生岁岁陪着你",
-                "不准离开我半步",
-                "你是我的唯一执念",
-                "把你牢牢拥入怀中",
-                "只许对我一人温柔",
-                "我的爱意只赠予你",
-                "想将你私藏一辈子",
-                "心跳全部为你而动",
-                "靠近我，别再走远",
-                "这辈子都别想挣脱我"
-            ],
-            blackMad: [
-                "你为何总是敷衍我",
-                "不许对别人展露笑容",
-                "你的心思只能属于我",
-                "疏远我只会激怒我",
-                "别试图逃离我的视线",
-                "我不允许任何人靠近你",
-                "你的一举一动我都知晓",
-                "违背我只会付出代价",
-                "不要挑战我的耐心",
-                "我得不到也不会放手"
-            ]
-        };
+        let currentScene = "start";
+        let pendingScene = null;
 
-        function spawnTextEffect(type, count = 6, customText = null) {
-            const overlay = document.getElementById("textOverlay");
-            const textPool = customText ? [customText] : (type === "red" ? sickTexts.redLove : sickTexts.blackMad);
-            for (let i = 0; i < count; i++) {
-                setTimeout(() => {
-                    const span = document.createElement("span");
-                    span.className = type === "red" ? "red" : "black";
-                    span.textContent = textPool[Math.floor(Math.random() * textPool.length)];
-                    span.style.left = Math.random() * 96 + "%";
-                    span.style.top = Math.random() * 96 + "%";
-                    overlay.appendChild(span);
-                    setTimeout(() => span.style.opacity = 1, 15);
-                    setTimeout(() => {
-                        span.style.opacity = 0;
-                        setTimeout(() => span.remove(), 700);
-                    }, 6500);
-                }, i * 130);
+        // 弹出画面
+        function showPopup(text) {
+            document.getElementById("popupText").innerText = text;
+            document.getElementById("popup").classList.add("show");
+        }
+        function closePopup() {
+            document.getElementById("popup").classList.remove("show");
+            if (pendingScene) {
+                currentScene = pendingScene;
+                pendingScene = null;
+                updateScene();
             }
         }
 
         const scenes = {
             start: {
                 title: "序章 · 暮色初遇",
-                text: "傍晚微风拂过校园林荫道，夕阳染红半边天际，你独自漫步散心。前方少年静静靠在梧桐树下，侧脸清冷又温柔，目光自你出现起，便死死锁定在你身上，不曾挪开半分。他缓步朝你走来，步伐缓慢带着极强的压迫感，温柔皮囊之下，藏着早已根深蒂固的偏执心动。周遭气氛渐渐安静，整片天地仿佛只剩下你们二人。",
+                text: "傍晚微风拂过校园林荫道，夕阳染红半边天际，细碎金光散落满地，你独自一人慢悠悠漫步散心，心绪悠然闲适。前方梧桐树下静静伫立着一位少年，清隽侧脸在落日余晖下格外动人，自你踏入这片区域开始，他的视线便牢牢黏在你的身上，分毫未曾移动半分。",
                 mood: "mood-normal",
                 choices: [
-                    { text: "主动停下脚步，轻声回应他", next: "meetTalk1", effect: "red", customText:"终于等到你走向我" },
-                    { text: "微微低头，害羞不敢对视", next: "meetTalk2", effect: "red", customText:"害羞的样子真可爱" },
-                    { text: "故作冷淡，径直侧身走过", next: "meetCold", effect: "black", customText:"为何刻意无视我" },
-                    { text: "好奇打量，主动上前搭话", next: "meetChat", effect: "red", customText:"主动靠近我最欢喜" }
+                    { text: "主动停下脚步轻声回应", next: "meetTalk1", popup: "终于……等到你愿意看向我了。" },
+                    { text: "低头腼腆闪躲不敢对视", next: "meetTalk2" },
+                    { text: "神色冷淡径直侧身走过", next: "meetCold", popup: "你敢无视我……很好，我记住了。" },
+                    { text: "心生好奇主动上前搭话", next: "meetChat" }
                 ]
             },
             meetTalk1: {
                 title: "初遇交谈 · 温柔试探",
-                text: "你停下脚步轻声回应，少年眼底瞬间漾开浓郁笑意，语气轻柔无比，细细询问你的日常喜好、作息行程，看似随意闲聊，实则默默把你所有信息全部牢记在心。晚风轻轻吹动他的衣角，距离渐渐拉近，你能清晰闻到他身上清冷干净的气息，气氛暧昧又静谧，他的目光温柔缱绻，满满都是藏不住的爱意。",
+                text: "你停下脚步轻声作答，少年澄澈眼眸之中瞬间漾开满满的温柔笑意，语调轻柔舒缓，细细询问着你的日常作息、兴趣喜好与生活琐事。",
                 mood: "mood-love",
                 choices: [
-                    { text: "如实诉说自己日常喜好", next: "knowMore", effect: "red", customText:"我会全部牢牢记住" },
-                    { text: "简单敷衍回答，不愿多说", next: "perfunctory", effect: "black", customText:"为何不愿与我多说" },
-                    { text: "反问他的喜好，拉近距离", next: "mutualTalk", effect: "red", customText:"愿意了解我真好" },
-                    { text: "借口有事，准备先行离开", next: "wantLeave", effect: "black", customText:"刚见面就要离开吗" }
+                    { text: "坦然诉说自己全部喜好", next: "knowMore", popup: "你的一切……我都会牢牢刻在心里。" },
+                    { text: "简单敷衍不愿过多交谈", next: "perfunctory", popup: "你在敷衍我……是吗？" },
+                    { text: "主动反问喜好拉近关系", next: "mutualTalk" },
+                    { text: "借口有事匆忙抽身离开", next: "wantLeave" }
                 ]
             },
             meetTalk2: {
                 title: "腼腆相望 · 心生悸动",
-                text: "你羞涩低头不敢与他对视，少年见你这般模样，心头爱意愈发浓烈，放缓语气轻声安抚你不必紧张。他一步步慢慢靠近，始终保持礼貌距离，却依旧让你心跳急速飙升。他静静注视着你的眉眼，眼神痴迷又专注，仿佛世间所有美好，都不及你半分模样。",
+                text: "你脸颊微红低头垂眸，不敢与眼前少年对视，这般羞怯模样让他心底的喜欢愈发浓烈。",
                 mood: "mood-love",
                 choices: [
-                    { text: "慢慢抬头，直视他的双眼", next: "eyeLove", effect: "red", customText:"你的眼眸太过动人" },
-                    { text: "依旧低头，沉默不言不语", next: "silentShy", effect: "red", customText:"安静的你格外迷人" },
-                    { text: "小声开口，简单回应几句", next: "softReply", effect: "red", customText:"你的声音格外好听" },
-                    { text: "慌张转身，想要快步逃走", next: "flusterRun", effect: "black", customText:"不要慌张逃离我" }
+                    { text: "鼓起勇气抬头直视双眸", next: "eyeLove", popup: "你的眼睛……真好看，我好想一直看着。" },
+                    { text: "依旧低头沉默不言不语", next: "silentShy" },
+                    { text: "小声低语简单回应几句", next: "softReply" },
+                    { text: "慌乱失神转身快步逃离", next: "flusterRun", popup: "跑什么？你以为……跑得掉吗？" }
                 ]
             },
             meetCold: {
                 title: "刻意疏离 · 暗生执念",
-                text: "你故作冷淡侧身走过，无视他的存在。少年脸上的温柔笑意瞬间消散，周身气温骤然下降，阴冷气息缓缓蔓延。他伫立原地静静望着你的背影，眼底偏执情绪不断翻涌，原本浅浅的好感，彻底转变为势在必得的占有欲。越是得不到回应，他便越是下定决心，一定要将你牢牢攥在手心。",
+                text: "你神色淡漠无视对方，径直从他身旁擦肩而过。少年脸上温润的笑意瞬间消散殆尽，周身空气骤然变冷，阴冷压抑的气息缓缓蔓延开来。",
                 mood: "mood-nervous",
                 choices: [
-                    { text: "走后暗自回头悄悄观望", next: "lookBack", effect: "red", customText:"你终究还是在意我" },
-                    { text: "全程无视，头也不回离开", next: "ignoreAll", effect: "black", customText:"我一定会让你注意我" },
-                    { text: "内心不安，步伐渐渐放慢", next: "uneasySlow", effect: "black", customText:"你已经开始心慌了对吗" }
+                    { text: "行走途中忍不住回头张望", next: "lookBack", popup: "你还是在意我的……对吧？" },
+                    { text: "全然无视头也不回向前走", next: "ignoreAll", popup: "没关系，我会让你再也离不开我。" },
+                    { text: "内心慌乱不安放慢脚步", next: "uneasySlow" }
                 ]
             },
             meetChat: {
                 title: "主动搭话 · 情愫升温",
-                text: "你鼓起勇气主动上前搭话，少年明显一愣，随即露出极为欢喜的神情，热情回应你的每一句话。两人越聊越是投机，从日常趣事聊到内心想法，相处氛围轻松又甜蜜。夕阳渐渐落下，夜色慢慢降临，他看向你的眼神，早已盛满再也藏不住的深情。",
+                text: "你鼓起勇气主动上前开启话题，少年先是微微一怔，随即展露满心欢喜的神情，热情细致回应你的每一句话语。",
                 mood: "mood-love",
                 choices: [
-                    { text: "相约下次一同散步闲聊", next: "makeAnAppointment", effect: "red", customText:"我无比期待下次相见" },
-                    { text: "聊完之后礼貌道别分开", next: "politePart", effect: "black", customText:"还想再多陪你一会" },
-                    { text: "顺势询问他是否单身", next: "askSingle", effect: "red", customText:"我的心早已属于你" },
-                    { text: "提议一起去街边散步吹风", next: "walkTogether", effect: "red", customText:"能与你同行万分幸福" }
-                ]
-            },
-            knowMore: {
-                title: "熟记喜好 · 暗中筹备",
-                text: "你坦然说出自己所有喜好与习惯，少年一字一句全部铭记于心，默默在心底规划往后如何贴近你的生活。往后日子里，你会频繁遇见贴合你喜好的事物，偶遇的巧合越来越多，你渐渐察觉，这份相遇从来都不是偶然，而是他蓄谋已久的靠近。",
-                mood: "mood-normal",
-                choices: [
-                    { text: "察觉巧合过多心生疑惑", next: "doubtIntent", effect: "black", customText:"就算察觉也躲不开我" },
-                    { text: "只当皆是缘分坦然接受", next: "believeFate", effect: "red", customText:"缘分注定你属于我" },
-                    { text: "刻意改变喜好避开他", next: "changeLike", effect: "black", customText:"无论如何我都能找到你" }
+                    { text: "相约闲暇之时一同散步", next: "makeAnAppointment", popup: "和我约定……太好了，真的太好了。" },
+                    { text: "闲谈结束礼貌道别分开", next: "politePart", popup: "这么快就想走吗……我还没看够你。" },
+                    { text: "委婉询问对方感情状态", next: "askSingle" },
+                    { text: "提议结伴沿街漫步吹风", next: "walkTogether" }
                 ]
             },
             eyeLove: {
                 title: "目光相融 · 心动沦陷",
-                text: "你鼓起勇气抬头与他四目相对，深邃眼眸两两相撞，一瞬间空气仿佛静止。少年眼中满是浓烈深情，直白诉说着满心欢喜，温热气息扑面而来，暧昧氛围达到顶峰，此刻无声胜有声，彼此心中都已然泛起别样情愫。",
+                text: "你鼓起勇气抬眸与他四目相对，清澈眼眸两两相撞的瞬间，周遭一切仿佛尽数静止。",
                 mood: "mood-love",
                 choices: [
-                    { text: "被眼神打动，内心彻底心动", next: "heartFall", effect: "red", customText:"沦陷在我的爱意之中吧" },
-                    { text: "慌乱移开视线脸颊发烫", next: "shyAwayEye", effect: "red", customText:"脸红的样子太可爱" },
-                    { text: "镇定自若，依旧平静对视", next: "calmStare", effect: "red", customText:"这般沉稳更让我着迷" }
-                ]
-            },
-            makeAnAppointment: {
-                title: "相约再会 · 爱意渐浓",
-                text: "二人定下下次见面之约，分开之时彼此都满心不舍。自此次相遇过后，他准时赴约，次次贴心陪伴，清晨问候、傍晚相伴，无时无刻不占据你的空余时间，一点点侵入你的生活圈子，让你慢慢习惯身边有他的存在。",
-                mood: "mood-love",
-                choices: [
-                    { text: "渐渐习惯他的贴身陪伴", next: "usedCompany", effect: "red", customText:"习惯我就再也离不开了" },
-                    { text: "觉得陪伴太过密集不适", next: "feelTired", effect: "black", customText:"只想时时刻刻陪着你" },
-                    { text: "满心欢喜期待每一次见面", next: "lookForwardMeet", effect: "red", customText:"你的期待便是我的欢喜" },
-                    { text: "刻意减少赴约推脱见面", next: "refuseDate", effect: "black", customText:"推脱只会让我更加偏执" }
+                    { text: "深陷心动彻底沉沦其中", next: "heartFall", popup: "就这样……看着我，只准看着我。" },
+                    { text: "慌乱羞涩连忙移开视线", next: "shyAwayEye" },
+                    { text: "镇定从容依旧静静对视", next: "calmStare" }
                 ]
             },
             heartFall: {
-                title: "心意沉沦 · 正式表白场景",
-                text: "夜色温柔，街边灯火点点，少年将你带到安静无人的河畔，晚风轻柔吹动发丝。他缓缓停下脚步，转过身认真望向你，褪去所有随性温柔，神情无比郑重，迎来全篇核心专属**深情表白交互场景**。他微微握紧你的手腕，语气低沉认真，一字一句诉说积攒许久的满腔爱意，周遭寂静无声，只剩他滚烫真挚的告白话语萦绕耳边。",
+                title: "心意沉沦 · 正式深情表白",
+                text: "温柔夜色笼罩街巷，街边灯火朦胧柔和，少年将你带到僻静无人的河畔晚风轻轻吹动发丝，氛围感十足。",
                 mood: "mood-love",
                 choices: [
-                    { text: "毫不犹豫点头答应交往", next: "agreeLove", effect: "red", customText:"此生得你足矣，永不分离" },
-                    { text: "内心犹豫，暂时无法确定", next: "hesitateLove", effect: "black", customText:"我会等到你心甘情愿" },
-                    { text: "委婉拒绝，只想维持朋友", next: "refuseConfess", effect: "black", customText:"朋友身份我绝不满足" },
-                    { text: "害羞不语，默认接受心意", next: "silentAgree", effect: "red", customText:"沉默便是最好的答案" }
+                    { text: "满心欢喜点头答应交往", next: "agreeLove", popup: "你是我的……从今天起，完完全全是我的。" },
+                    { text: "内心犹豫迟迟无法决断", next: "hesitateLove", popup: "没关系，我可以等……等到你属于我。" },
+                    { text: "委婉拒绝只想维持朋友", next: "refuseConfess" },
+                    { text: "羞涩沉默默认接受心意", next: "silentAgree" }
                 ]
             },
             agreeLove: {
                 title: "确定关系 · 偏执宠爱开启",
-                text: "你点头答应与他在一起，少年瞬间将你紧紧拥入怀中，怀抱用力又温暖，仿佛想要将你揉进骨血之中。自此他明目张胆对你极致偏爱，日常事事顺从满足你的心愿，可隐藏在温柔之下的极强占有欲，也渐渐开始显露出来。不准异性靠近、不准单独外出、事事报备行踪，甜蜜之中渐渐带上无形枷锁。",
+                text: "你点头应允和他相恋，少年当即伸手将你紧紧拥入怀中，力道温柔却带着不容挣脱的占有感，恨不得将你融入骨血之中。",
                 mood: "mood-love",
                 choices: [
-                    { text: "享受独一份偏爱全然顺从", next: "obeyAll", effect: "red", customText:"乖乖听话我会更宠爱你" },
-                    { text: "反感束缚想要私人空间", next: "needSpace", effect: "black", customText:"私人空间只会滋生距离" },
-                    { text: "委婉提醒他不要太过管束", next: "remindHim", effect: "black", customText:"管束皆是因为太过爱你" },
-                    { text: "沉浸甜蜜忽略所有隐患", next: "immerseSweet", effect: "red", customText:"只管安心留在我身边就好" }
-                ]
-            },
-            hesitateLove: {
-                title: "犹豫迟疑 · 耐心蛰伏等待",
-                text: "面对深情告白你内心犹豫不决，没有立刻给出答案。少年没有丝毫逼迫，依旧温柔如初默默陪伴在你身旁，收敛所有偏执情绪，用长久陪伴慢慢融化你的内心。可在无人看见的角落，他依旧默默清理所有靠近你的异性，暗中扫清一切阻碍，静静等候你彻底属于他的那一天。",
-                mood: "mood-normal",
-                choices: [
-                    { text: "日久生情慢慢接受心意", next: "slowAccept", effect: "red", customText:"我的等待从来不会白费" },
-                    { text: "思虑再三最终选择拒绝", next: "finalRefuse", effect: "black", customText:"拒绝也无法推开我的心意" },
-                    { text: "保持距离继续观察试探", next: "keepDistanceWatch", effect: "black", customText:"无论如何我都不会放手" }
+                    { text: "沉溺偏爱心甘情愿顺从", next: "obeyAll", popup: "真乖……这样才是我的好孩子。" },
+                    { text: "反感束缚渴望私人空间", next: "needSpace", popup: "私人空间？你不需要那种东西。" },
+                    { text: "轻声劝说希望他放宽管束", next: "remindHim" },
+                    { text: "沉浸甜蜜无视潜在隐患", next: "immerseSweet" }
                 ]
             },
             refuseConfess: {
                 title: "拒绝告白 · 偏执彻底爆发",
-                text: "你明确拒绝他的深情告白，只想维持普通朋友关系。少年脸上温柔彻底碎裂，眼底翻涌浓郁的阴郁与疯狂，周身气氛冷到极致。长久以来的隐忍与克制尽数崩塌，往日温柔不复存在，取而代之的是势必要将你强行留在身边的极端想法，一场无声的禁锢自此拉开序幕。",
+                text: "你明确拒绝他的告白，只想维持平淡普通的朋友关系。少年脸上所有温柔尽数碎裂消散，眼底翻涌着阴郁疯狂的情绪，周身氛围冰冷刺骨。",
                 mood: "mood-mad",
                 choices: [
-                    { text: "察觉不对劲立刻转身离开", next: "rushAway", effect: "black", customText:"你逃不掉我的掌控范围" },
-                    { text: "心生恐惧主动低头服软", next: "fearSoft", effect: "red", customText:"早点顺从就不会受伤" },
-                    { text: "据理力争坚持自己想法", next: "argueFirm", effect: "black", customText:"你的反抗毫无用处" }
+                    { text: "察觉异常慌忙转身逃离", next: "rushAway", popup: "逃吧……随便你逃，我一定会抓到你。" },
+                    { text: "心生畏惧主动低头服软", next: "fearSoft", popup: "早这样乖乖听话，不就好了吗。" },
+                    { text: "据理力争坚守自身想法", next: "argueFirm" }
                 ]
             },
             obeyAll: {
                 title: "全然顺从 · 温柔囚笼深陷",
-                text: "你全盘顺从他所有要求，心甘情愿接受他的一切管束与偏爱。他将世间所有温柔宠溺全部给予你，把你照顾得无微不至，衣食住行全部悉心安排妥当。你被困在他亲手打造的温柔牢笼之中，不用面对外界纷扰，安稳沉浸在独属于二人的小世界里，渐渐彻底失去逃离的想法。",
+                text: "你顺从他所有要求，心甘情愿接受他的偏爱与管束。他倾尽所有温柔悉心照料你的衣食住行，将你呵护得无微不至。",
                 mood: "mood-dark",
-                loveEnding:"我倾尽全部温柔只为困住你，你的世界里只需要有我一人便足够，不必接触外人，不必向往自由，留在我怀里，被我一辈子偏爱禁锢，就是我能给你最极致圆满的爱意，生生世世，永不放开你的手。",
+                loveEnding: "我倾尽世间所有温柔只为将你安稳困住，你的世界之中只需要存有我一人便足够，不必接触旁人，不必追寻自由，安心依偎在我怀中。",
                 choices: [{ text: "重新开启全新剧情", next: "restart" }]
             },
             needSpace: {
                 title: "渴求自由 · 矛盾冲突爆发",
-                text: "你渴望拥有私人自由空间，不愿被时刻管束束缚，频频与他产生矛盾争执。他内心极度不安，害怕你的自由会让别人趁机闯入你的世界，害怕你渐渐远离自己。争吵过后他总会低声落泪道歉，用脆弱模样博取你的心软，一次次将你的底线不断拉扯消磨。",
+                text: "你渴望拥有独属于自己的私人空间，厌烦无时无刻的管束束缚，二人之间矛盾争执频频爆发。",
                 mood: "mood-nervous",
                 choices: [
-                    { text: "心软原谅再次选择妥协", next: "softForgive", effect: "red", customText:"原谅我只是太过害怕失去你" },
-                    { text: "心灰意冷决心彻底分开", next: "decideBreak", effect: "black", customText:"想要分开绝无可能" },
-                    { text: "彼此冷静暂时断开联系", next: "calmBreakContact", effect: "black", customText:"断开联系只会让我疯狂" }
+                    { text: "心软释怀再次选择妥协", next: "softForgive", popup: "别离开我……求你了。" },
+                    { text: "心灰意冷决意彻底分开", next: "decideBreak", popup: "分手？你觉得……我会同意吗？" },
+                    { text: "彼此冷静暂时断开联络", next: "calmBreakContact" }
                 ]
             },
             rushAway: {
                 title: "仓皇逃离 · 全网搜寻追捕",
-                text: "你察觉他情绪失控慌忙逃离现场，本以为能够彻底摆脱纠缠。可自此之后，无论你去往校园何处、大街小巷、甚至家中附近，都能轻易撞见他的身影。他摸清了你所有出行路线、社交圈子、亲友住址，全方位无死角将你牢牢锁定，你已然彻底陷入无处可逃的绝境之中。",
+                text: "你察觉到他情绪失控之后慌忙逃离，本以为能够彻底摆脱这份偏执纠缠。可自此之后无论你去往何处，总能轻易撞见他的身影。",
                 mood: "mood-mad",
-                loveEnding:"从你拒绝我的那一刻开始，我就注定不会放手，世间再大也容不下你的逃离，我会踏遍所有角落寻你，把你带回身边牢牢看管，哪怕困住你的人身，也要彻底占有你的整颗真心，这份偏执爱意，至死方休。",
+                loveEnding: "从你狠心拒绝我的那一刻开始，我便早已下定决心绝不放手，天地辽阔也容不下你的肆意逃离。",
                 choices: [{ text: "重新开启全新剧情", next: "restart" }]
             },
             decideBreak: {
                 title: "决意分手 · 极致偏执禁锢",
-                text: "你下定决心提出分手，彻底斩断二人之间所有情愫。这个决定彻底触碰他最后的底线，往日所有温柔温情全部消散，他不再伪装情绪，直白展现出内心所有极端想法，开始用各种方式限制你的出行、隔绝你的社交，将你慢慢圈禁在只属于他的小小天地之中。",
+                text: "你下定决心提出分手，斩断二人之间所有情感牵绊。这句话彻底触碰了他内心最后的底线。",
                 mood: "mood-mad",
-                loveEnding:"我可以包容你的所有小脾气，可以倾尽所有对你好，唯独不能接受你的离开。分手二字永远不许说出口，你生来就该依附于我，被我独自占有，哪怕禁锢一生，我也绝不会放你奔向任何人。",
+                loveEnding: "我能够包容你所有小脾气，倾尽所有真心待你，唯独万万不能接受你的离开。",
                 choices: [{ text: "重新开启全新剧情", next: "restart" }]
             },
             slowAccept: {
                 title: "日久情深 · 慢慢沦陷归属",
-                text: "在长久贴心陪伴之下，你渐渐放下心中所有顾虑，心甘情愿接受他的心意，慢慢主动靠近他，接纳他所有好与不好。他欣喜万分，愈发珍惜来之不易的感情，收敛大半极端偏执，只将满满的温柔与真心尽数交付于你，二人安稳甜蜜相守相伴。",
+                text: "在日复一日贴心温柔的陪伴之下，你渐渐放下内心所有顾虑与防备，心甘情愿接纳他的满腔心意。",
                 mood: "mood-love",
-                loveEnding:"慢慢来没关系，我愿意花费数年光阴等候你走进我的心底，只要最后陪在你身边的人是我，所有等待全部值得，往后余生，朝朝暮暮，我都会倾尽一生爱意好好呵护你，不离不弃。",
+                loveEnding: "慢慢来从来都没关系，我甘愿耗费漫长岁月静静等候你走进我的心底，只要最后陪在你身边的人是我。",
                 choices: [{ text: "重新开启全新剧情", next: "restart" }]
             },
-            finalRefuse: {
-                title: "最终拒绝 · 爱意扭曲沉沦",
-                text: "经过长久思考你依旧选择拒绝他的心意，彻底断绝所有相处可能。一次次的真心付出全部落空，他内心爱意彻底扭曲变质，从最初纯粹的喜欢，彻底转变为疯狂的占有执念，哪怕无法光明正大在一起，也要默默守在你身边，阻断所有接近你的异性。",
-                mood: "mood-sad",
-                loveEnding:"就算不能光明正大陪在你身边，我也会默默守在你的身后，斩断所有觊觎你的人，不让任何人夺走你的目光，我的爱意不求回应，只求能够一直默默注视着你，此生执念，永不消散。",
+            silentAgree: {
+                title: "沉默接受 · 甜蜜热恋开启",
+                text: "你面颊羞涩沉默不语，这般模样已然默认接纳了他的告白心意。",
+                mood: "mood-love",
+                loveEnding: "你的沉默便是给予我最好的答复，往后漫长岁月之中，我会用尽全部行动证明我的真心爱意。",
                 choices: [{ text: "重新开启全新剧情", next: "restart" }]
             }
         };
 
-        let currentScene = "start";
-        const bodyBg = document.getElementById("bodyBg");
-        const titleDom = document.getElementById("title");
-        const textDom = document.getElementById("text");
-        const choicesDom = document.getElementById("choices");
-
-        function goToScene(sceneId, effect, customText) {
-            if(sceneId === "restart") {
+        function goToScene(sceneId, popupText) {
+            if (sceneId === "restart") {
                 currentScene = "start";
-                document.getElementById("textOverlay").innerHTML = "";
+                updateScene();
+                return;
+            }
+            if (popupText) {
+                pendingScene = sceneId;
+                showPopup(popupText);
             } else {
                 currentScene = sceneId;
+                updateScene();
             }
-            if(effect) spawnTextEffect(effect,6,customText);
-            updateScene();
         }
 
         function updateScene() {
             const scene = scenes[currentScene];
             bodyBg.className = scene.mood;
             titleDom.textContent = scene.title;
-            if(scene.loveEnding){
+            if (scene.loveEnding) {
                 textDom.innerHTML = scene.text + `<br><br><span class="love-word">【专属偏执爱意独白】<br>${scene.loveEnding}</span>`;
-            }else{
+            } else {
                 textDom.textContent = scene.text;
             }
             choicesDom.innerHTML = "";
-            scene.choices.forEach(choice=>{
+            scene.choices.forEach(choice => {
                 const btn = document.createElement("button");
-                btn.className = choice.next==="restart"?"choice-btn end-btn":"choice-btn";
+                btn.className = choice.next === "restart" ? "choice-btn end-btn" : "choice-btn";
                 btn.textContent = choice.text;
-                btn.onclick = ()=>goToScene(choice.next,choice.effect,choice.customText);
+                btn.onclick = () => goToScene(choice.next, choice.popup);
                 choicesDom.appendChild(btn);
-            })
+            });
         }
+
         updateScene();
     </script>
 </body>
