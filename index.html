@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>偏执爱意 · 最终完整版</title>
+    <title>偏执爱意 · 终极完整版</title>
     <style>
         * {
             margin: 0;
@@ -63,48 +63,6 @@
             50%{transform:translateY(-50%) scale(1.5); opacity:1; text-shadow:0 0 30px red;}
         }
 
-        .status-panel{
-            max-width: 620px;
-            margin: 0 auto 15px;
-            display: flex;
-            gap:15px;
-            justify-content: space-between;
-            padding:10px 15px;
-            background:rgba(30,15,15,0.8);
-            border-radius:8px;
-            border:1px solid #662222;
-            z-index:10;
-            position:relative;
-        }
-        .status-item{
-            flex:1;
-            text-align:center;
-            font-size:14px;
-        }
-        .status-bar{
-            width:100%;
-            height:8px;
-            background:#222;
-            border-radius:4px;
-            margin-top:5px;
-            overflow:hidden;
-        }
-        .love-fill{
-            height:100%;
-            background:#ff5566;
-            transition:width 0.5s;
-        }
-        .sense-fill{
-            height:100%;
-            background:#55aaff;
-            transition:width 0.5s;
-        }
-        .danger-fill{
-            height:100%;
-            background:#ffaa00;
-            transition:width 0.5s;
-        }
-
         .game-container {
             max-width: 620px;
             width: 100%;
@@ -133,7 +91,7 @@
         .scene-text {
             margin-bottom: 32px;
             font-size: 15.5px;
-            min-height: 120px;
+            min-height: 200px;
             transition: color 0.5s ease;
             white-space: pre-line;
         }
@@ -167,6 +125,7 @@
             background: #331818;
             border-color: #ff6666;
             color: #ffaaaa;
+            letter-spacing: 1px;
         }
         .end-btn {
             background: #b82020;
@@ -190,6 +149,11 @@
             line-height:2;
             background:rgba(255,20,30,0.08);
             border-radius:0 8px 8px 0;
+            animation: diaryFade 1.2s ease;
+        }
+        @keyframes diaryFade{
+            from{opacity:0;transform: translateX(-10px);}
+            to{opacity:1;transform: translateX(0);}
         }
 
         .popup {
@@ -206,7 +170,14 @@
             padding: 20px;
             backdrop-filter: blur(5px);
         }
-        .popup.show { display: flex; }
+        .popup.show {
+            display: flex;
+            animation: popOpen 0.4s ease;
+        }
+        @keyframes popOpen{
+            from{opacity:0;transform:scale(0.8);}
+            to{opacity:1;transform:scale(1);}
+        }
         .popup-box {
             background: #1b0b0b;
             border: 2px solid #ff5555;
@@ -215,12 +186,14 @@
             width: 100%;
             padding: 40px 30px;
             text-align: center;
+            box-shadow: 0 0 30px #ff000066;
         }
         .popup-text {
             font-size: 18px;
             color: #ff8888;
             line-height: 2;
             margin-bottom: 30px;
+            font-weight: bold;
         }
         .popup-close {
             padding: 12px 30px;
@@ -230,30 +203,28 @@
             border-radius: 8px;
             font-size: 16px;
             cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .popup-close:hover{
+            background: #ff2222;
+            box-shadow: 0 0 15px #ff3333;
+        }
+
+        .yandere-text {
+            color: #ff4444;
+            font-weight: bold;
+            text-shadow: 0 0 8px #ff0000;
+            animation: yandereShake 0.5s ease-in-out infinite alternate;
+        }
+        @keyframes yandereShake {
+            from{transform: translateX(0);}
+            to{transform: translateX(3px);}
         }
     </style>
 </head>
 <body>
     <div class="heart-left" id="heartLeft">❤</div>
     <div class="heart-right" id="heartRight">❤</div>
-
-    <div class="status-panel">
-        <div class="status-item">
-            <div>姐姐好感度</div>
-            <div class="status-bar"><div class="love-fill" id="loveBar" style="width:50%"></div></div>
-            <span id="loveNum">50</span>
-        </div>
-        <div class="status-item">
-            <div>自身理智值</div>
-            <div class="status-bar"><div class="sense-fill" id="senseBar" style="width:60%"></div></div>
-            <span id="senseNum">60</span>
-        </div>
-        <div class="status-item">
-            <div>危险指数</div>
-            <div class="status-bar"><div class="danger-fill" id="dangerBar" style="width:30%"></div></div>
-            <span id="dangerNum">30</span>
-        </div>
-    </div>
 
     <div class="popup" id="popup">
         <div class="popup-box">
@@ -287,18 +258,6 @@
             }
         }
 
-        function updateStatus(){
-            document.getElementById("loveBar").style.width = loveValue+"%";
-            document.getElementById("loveNum").innerText = loveValue;
-            document.getElementById("senseBar").style.width = senseValue+"%";
-            document.getElementById("senseNum").innerText = senseValue;
-            document.getElementById("dangerBar").style.width = dangerValue+"%";
-            document.getElementById("dangerNum").innerText = dangerValue;
-            updateHeartAnimation();
-            if(senseValue <= 20){ currentScene = "senseFailBE"; updateScene(); }
-            if(dangerValue >= 85){ currentScene = "dangerExtremeBE"; updateScene(); }
-        }
-
         function showPopup(t){
             document.getElementById("popupText").innerText = t;
             document.getElementById("popup").classList.add("show");
@@ -313,113 +272,250 @@
         }
 
         const scenes = {
-            start:{title:"序章·暮色初遇",text:"黄昏的风掠过校园，你独自走在林荫道上。不远处，那位气质清冷、长相绝美的姐姐一直望着你，视线灼热得让你无法忽视。她似乎已经等你很久很久。",mood:"mood-normal",choices:[
-                {text:"主动上前打招呼",next:"meet1",love:12,sense:-3,danger:-5},
-                {text:"假装没看见，继续走",next:"cold1",love:-15,sense:5,danger:18},
-                {text:"害羞低头，放慢脚步",next:"shy1",love:8,sense:0,danger:0},
-                {text:"好奇多看她几眼",next:"chat1",love:10,sense:-2,danger:-3}
-            ]},
-            meet1:{title:"温柔搭话",text:"你主动打招呼，姐姐眼底瞬间亮起光芒，声音轻柔：“终于，你愿意理我了。”她一步步靠近，气息温柔却带着占有欲。",mood:"mood-love",choices:[
-                {text:"温柔回应她",next:"talk2",love:15,sense:-4,danger:2},
-                {text:"保持距离",next:"cold2",love:-10,sense:4,danger:12},
-                {text:"询问她的名字",next:"chat2",love:10,sense:-2,danger:0}
-            ]},
-            cold1:{title:"刻意回避",text:"你无视她，她的气息瞬间变冷。脚步声缓缓靠近，你能感觉到她在盯着你的背影，像猎物一样。",mood:"mood-nervous",choices:[
-                {text:"回头道歉",next:"talk2",love:5,sense:-2,danger:10},
-                {text:"加快脚步离开",next:"cold3",love:-20,sense:8,danger:25},
-                {text:"停下不动",next:"shy2",love:3,sense:-1,danger:8}
-            ]},
-            shy1:{title:"羞涩反应",text:"你害羞的样子让她心情愉悦，她轻笑：“你真可爱，可爱到……想把你藏起来。”",mood:"mood-love",choices:[
-                {text:"抬头看她",next:"talk2",love:13,sense:-3,danger:1},
-                {text:"更害羞了",next:"shy3",love:7,sense:0,danger:5},
-                {text:"小声回应",next:"chat2",love:9,sense:-1,danger:0}
-            ]},
-            chat1:{title:"好奇注视",text:"你的目光让她十分满足，她主动走向你：“你在看我？那就好好看着，你的世界里，只能有我。”",mood:"mood-love",choices:[
-                {text:"点头认可",next:"talk2",love:16,sense:-5,danger:3},
-                {text:"移开视线",next:"cold2",love:-12,sense:3,danger:15},
-                {text:"和她聊天",next:"chat2",love:11,sense:-2,danger:-2}
-            ]},
-            talk2:{title:"温柔深入",text:"你们聊了很多，她对你的一切都充满兴趣，从喜好到生活，她默默记下所有细节，眼底的爱意越来越浓。",mood:"mood-love",choices:[
-                {text:"认真回答所有问题",next:"heartFall",love:20,sense:-6,danger:4},
-                {text:"有所保留",next:"cold4",love:-8,sense:4,danger:10},
-                {text:"主动关心她",next:"chat3",love:18,sense:-4,danger:2}
-            ]},
-            cold2:{title:"疏离感",text:"你的疏远让她情绪微变，语气变冷：“你在怕我？还是……在讨厌我？”",mood:"mood-nervous",choices:[
-                {text:"解释自己没有",next:"talk3",love:6,sense:-2,danger:8},
-                {text:"沉默不语",next:"cold4",love:-14,sense:5,danger:20},
-                {text:"轻声安慰",next:"shy3",love:9,sense:-1,danger:6}
-            ]},
-            chat2:{title:"轻松对话",text:"对话氛围轻松，她对你的好感持续上升，看你的眼神越来越温柔。",mood:"mood-love",choices:[
-                {text:"继续聊天",next:"talk3",love:14,sense:-3,danger:1},
-                {text:"提议一起走走",next:"heartFall",love:19,sense:-5,danger:3},
-                {text:"说自己要离开",next:"cold4",love:-10,sense:4,danger:14}
-            ]},
-            shy2:{title:"慌乱无措",text:"你不知所措的样子让她觉得无比珍贵，她轻声安抚，却悄悄拉近了距离。",mood:"mood-love",choices:[
-                {text:"慢慢放松",next:"talk3",love:12,sense:-2,danger:2},
-                {text:"依旧紧张",next:"shy3",love:6,sense:1,danger:7},
-                {text:"尝试交流",next:"chat3",love:10,sense:-1,danger:0}
-            ]},
-            cold3:{title:"逃离意图",text:"你想逃，她瞬间挡在你面前，笑容消失：“不准逃，你只能留在我身边。”",mood:"mood-mad",choices:[
-                {text:"妥协停下",next:"talk3",love:4,sense:-3,danger:15},
-                {text:"强行绕开",next:"cold5",love:-25,sense:10,danger:30},
-                {text:"道歉示弱",next:"shy3",love:8,sense:0,danger:12}
-            ]},
-            shy3:{title:"温柔靠近",text:"她耐心陪着你，一点点靠近，温柔得让你无法抗拒。",mood:"mood-love",choices:[
-                {text:"接受她的靠近",next:"heartFall",love:17,sense:-4,danger:2},
-                {text:"轻轻躲开",next:"cold4",love:-9,sense:3,danger:11},
-                {text:"安静陪伴",next:"talk3",love:13,sense:-2,danger:1}
-            ]},
-            talk3:{title:"心意渐明",text:"她看着你，认真地说：“我喜欢你，喜欢到想把你永远留在身边。”",mood:"mood-love",choices:[
-                {text:"我也喜欢你",next:"agreeLove",love:25,sense:-8,danger:5},
-                {text:"我需要想想",next:"waitLove",love:10,sense:5,danger:12},
-                {text:"抱歉，我不能",next:"refuseLove",love:-30,sense:10,danger:35}
-            ]},
-            chat3:{title:"温馨相处",text:"相处越久，她对你的执念越深，她已经无法接受失去你。",mood:"mood-love",choices:[
-                {text:"愿意和她在一起",next:"agreeLove",love:23,sense:-7,danger:4},
-                {text:"保持朋友关系",next:"waitLove",love:8,sense:4,danger:15},
-                {text:"渐渐疏远",next:"cold5",love:-18,sense:6,danger:22}
-            ]},
-            cold4:{title:"不安加剧",text:"你的冷淡让她不安，危险气息越来越重。",mood:"mood-nervous",choices:[
-                {text:"主动缓和",next:"talk3",love:7,sense:-2,danger:10},
-                {text:"继续冷淡",next:"cold5",love:-22,sense:8,danger:28},
-                {text:"温柔道歉",next:"shy3",love:11,sense:-1,danger:8}
-            ]},
-            cold5:{title:"彻底冷漠",text:"你彻底推开她，她的温柔彻底破碎，只剩下偏执与疯狂。",mood:"mood-mad",choices:[
-                {text:"后悔挽回",next:"talk3",love:5,sense:-4,danger:20},
-                {text:"坚持远离",next:"refuseLove",love:-35,sense:12,danger:40}
-            ]},
-            waitLove:{title:"犹豫不定",text:"你的犹豫让她又疼又怒，她在耐心与疯狂之间挣扎。",mood:"mood-nervous",choices:[
-                {text:"最终接受",next:"agreeLove",love:18,sense:-6,danger:8},
-                {text:"最终拒绝",next:"refuseLove",love:-32,sense:11,danger:38}
-            ]},
-            heartFall:{title:"心意沉沦",text:"夕阳落下，她轻声告白，目光炽热而疯狂：“我好喜欢你，喜欢你到……可以放弃一切。”",mood:"mood-love",choices:[
-                {text:"我愿意",next:"agreeLove",love:30,sense:-10,danger:6},
-                {text:"我需要时间",next:"waitLove",love:12,sense:6,danger:14},
-                {text:"我不能接受",next:"refuseLove",love:-28,sense:9,danger:32}
-            ]},
-            agreeLove:{title:"确认关系",text:"你接受了她，她激动地抱住你，力道紧得让你无法呼吸，仿佛要把你揉进身体里。",mood:"mood-love",choices:[
-                {text:"全心依赖她",next:"ending4",love:35,sense:-15,danger:5},
-                {text:"想要私人空间",next:"ending1",love:-20,sense:10,danger:25},
-                {text:"享受甜蜜",next:"ending2",love:20,sense:-12,danger:18}
-            ]},
-            refuseLove:{title:"拒绝告白",text:"你拒绝了她，她所有温柔瞬间消失，眼神变得冰冷而疯狂。",mood:"mood-mad",choices:[
-                {text:"逃跑",next:"ending3",love:-25,sense:8,danger:42},
-                {text:"坚持拒绝",next:"ending5",love:-40,sense:15,danger:50}
-            ]},
+            start:{
+                title:"序章·暮色初遇",
+                text:"黄昏的风掠过校园，你独自走在林荫道上。夕阳把树影拉得很长，空气里带着晚夏的余温。不远处，那位气质清冷、长相绝美的姐姐一直望着你，视线灼热得让你无法忽视。她站在梧桐树下，似乎已经等你很久很久，眼底藏着你看不懂的偏执与期待。",
+                mood:"mood-normal",
+                choices:[
+                    {text:"主动上前打招呼",next:"meet1",love:12,sense:-3,danger:-5,popup:"❤️ 姐姐内心：你终于主动走向我了，我等这一天，等了太久太久..."},
+                    {text:"假装没看见，继续走",next:"cold1",love:-15,sense:5,danger:18,popup:"⚠️ 姐姐内心：你居然无视我...没关系，我会让你再也离不开我。"},
+                    {text:"害羞低头，放慢脚步",next:"shy1",love:8,sense:0,danger:0,popup:"❤️ 姐姐内心：你害羞的样子，可爱到让我想立刻把你藏起来。"},
+                    {text:"好奇多看她几眼",next:"chat1",love:10,sense:-2,danger:-3,popup:"❤️ 姐姐内心：你的目光，是我活下去的全部意义。"}
+                ]
+            },
+            meet1:{
+                title:"温柔搭话",
+                text:"你主动打招呼，姐姐眼底瞬间亮起光芒，声音轻柔得像羽毛拂过心尖：“终于，你愿意理我了。”她一步步靠近，身上淡淡的冷香萦绕在鼻尖，气息温柔却带着不容拒绝的占有欲。",
+                mood:"mood-love",
+                choices:[
+                    {text:"温柔回应她",next:"talk2",love:15,sense:-4,danger:2,popup:"❤️ 姐姐内心：你的声音好温柔，我想一辈子听你说话。"},
+                    {text:"保持距离",next:"cold2",love:-10,sense:4,danger:12,popup:"⚠️ 姐姐内心：你在躲我？别害怕，我不会伤害你，只会永远陪着你。"},
+                    {text:"询问她的名字",next:"chat2",love:10,sense:-2,danger:0,popup:"❤️ 姐姐内心：你想知道我的名字？你开始在意我了，真好。"}
+                ]
+            },
+            cold1:{
+                title:"刻意回避",
+                text:"你无视她，径直从她身边走过。她脸上的温柔瞬间消失，周身空气骤然变冷。脚步声缓缓跟在你身后，你能感觉到她在盯着你的背影，像锁定猎物的猎手，沉默又危险。",
+                mood:"mood-nervous",
+                choices:[
+                    {text:"回头道歉",next:"talk2",love:5,sense:-2,danger:10,popup:"❤️ 姐姐内心：没关系，我原谅你，只要你回到我身边就好。"},
+                    {text:"加快脚步离开",next:"cold3",love:-20,sense:8,danger:25,popup:"⚠️ 姐姐内心：逃？你觉得你能逃得出我的手掌心吗？"},
+                    {text:"停下不动",next:"shy2",love:3,sense:-1,danger:8,popup:"❤️ 姐姐内心：你停下了，你心里还是有我的。"}
+                ]
+            },
+            shy1:{
+                title:"羞涩反应",
+                text:"你害羞地低下头，脚步不自觉慢了下来。姐姐轻笑一声，慢慢走近，声音里带着笑意：“你真可爱，可爱到……想把你藏起来，只给我一个人看。”",
+                mood:"mood-love",
+                choices:[
+                    {text:"抬头看她",next:"talk2",love:13,sense:-3,danger:1,popup:"❤️ 姐姐内心：你的眼睛真好看，我想永远沉溺在里面。"},
+                    {text:"更害羞了",next:"shy3",love:7,sense:0,danger:5,popup:"❤️ 姐姐内心：你害羞的模样，是我见过最美的风景。"},
+                    {text:"小声回应",next:"chat2",love:9,sense:-1,danger:0,popup:"❤️ 姐姐内心：你愿意和我说话，我真的好开心。"}
+                ]
+            },
+            chat1:{
+                title:"好奇注视",
+                text:"你的目光让她十分满足，她主动走向你，目光紧紧锁着你：“你在看我？那就好好看着，你的世界里，只能有我。”",
+                mood:"mood-love",
+                choices:[
+                    {text:"点头认可",next:"talk2",love:16,sense:-5,danger:3,popup:"❤️ 姐姐内心：你承认了，你的世界只能有我一个人。"},
+                    {text:"移开视线",next:"cold2",love:-12,sense:3,danger:15,popup:"⚠️ 姐姐内心：不准移开视线，看着我，只能看着我。"},
+                    {text:"和她聊天",next:"chat2",love:11,sense:-2,danger:-2,popup:"❤️ 姐姐内心：和我聊天吧，把你的一切都告诉我。"}
+                ]
+            },
+            talk2:{
+                title:"温柔深入",
+                text:"你们聊了很多，从日常作息到兴趣爱好，她听得很认真，把你说的每一句话都牢牢记在心里。她的眼底翻涌着浓烈的爱意，温柔的表象之下，是早已疯狂滋生的占有欲。",
+                mood:"mood-love",
+                choices:[
+                    {text:"认真回答所有问题",next:"heartFall",love:20,sense:-6,danger:4,popup:"❤️ 姐姐内心：你把一切都告诉我了，你是我的，完完全全是我的。"},
+                    {text:"有所保留",next:"cold4",love:-8,sense:4,danger:10,popup:"⚠️ 姐姐内心：你对我有所隐瞒？我会知道你的所有秘密。"},
+                    {text:"主动关心她",next:"chat3",love:18,sense:-4,danger:2,popup:"❤️ 姐姐内心：你关心我，你心里是有我的，对不对？"}
+                ]
+            },
+            cold2:{
+                title:"疏离感",
+                text:"你的疏远让她情绪微变，语气冷了几分：“你在怕我？还是……在讨厌我？”她的眼神带着受伤和偏执，危险的气息开始蔓延。",
+                mood:"mood-nervous",
+                choices:[
+                    {text:"解释自己没有",next:"talk3",love:6,sense:-2,danger:8,popup:"❤️ 姐姐内心：我就知道，你不会讨厌我。"},
+                    {text:"沉默不语",next:"cold4",love:-14,sense:5,danger:20,popup:"⚠️ 姐姐内心：沉默就是拒绝，你会付出代价的。"},
+                    {text:"轻声安慰",next:"shy3",love:9,sense:-1,danger:6,popup:"❤️ 姐姐内心：你在安慰我，你对我真好。"}
+                ]
+            },
+            chat2:{
+                title:"轻松对话",
+                text:"对话氛围轻松，她对你的好感持续上升，看你的眼神越来越温柔，带着藏不住的笑意和宠溺。",
+                mood:"mood-love",
+                choices:[
+                    {text:"继续聊天",next:"talk3",love:14,sense:-3,danger:1,popup:"❤️ 姐姐内心：和你聊天的每一秒，我都无比珍惜。"},
+                    {text:"提议一起走走",next:"heartFall",love:19,sense:-5,danger:3,popup:"❤️ 姐姐内心：和你并肩行走，是我最幸福的时刻。"},
+                    {text:"说自己要离开",next:"cold4",love:-10,sense:4,danger:14,popup:"⚠️ 姐姐内心：不准走，我还没和你待够。"}
+                ]
+            },
+            shy2:{
+                title:"慌乱无措",
+                text:"你不知所措的样子让她觉得无比珍贵，她轻声安抚你，却悄悄拉近了距离，几乎能感受到她温热的呼吸。",
+                mood:"mood-love",
+                choices:[
+                    {text:"慢慢放松",next:"talk3",love:12,sense:-2,danger:2,popup:"❤️ 姐姐内心：你愿意信任我了，真好。"},
+                    {text:"依旧紧张",next:"shy3",love:6,sense:1,danger:7,popup:"❤️ 姐姐内心：别紧张，我会一直陪着你，保护你。"},
+                    {text:"尝试交流",next:"chat3",love:10,sense:-1,danger:0,popup:"❤️ 姐姐内心：你愿意主动和我交流，我太开心了。"}
+                ]
+            },
+            cold3:{
+                title:"逃离意图",
+                text:"你想逃，她瞬间挡在你面前，脸上的笑容彻底消失：“不准逃，你只能留在我身边。”她的眼神冰冷而疯狂，你知道，她说到做到。",
+                mood:"mood-mad",
+                choices:[
+                    {text:"妥协停下",next:"talk3",love:4,sense:-3,danger:15,popup:"❤️ 姐姐内心：乖，只要你不逃，我什么都愿意给你。"},
+                    {text:"强行绕开",next:"cold5",love:-25,sense:10,danger:30,popup:"⚠️ 姐姐内心：你逼我的，别怪我用极端的方式留住你。"},
+                    {text:"道歉示弱",next:"shy3",love:8,sense:0,danger:12,popup:"❤️ 姐姐内心：没关系，我原谅你，只要你乖乖的。"}
+                ]
+            },
+            shy3:{
+                title:"温柔靠近",
+                text:"她耐心陪着你，一点点靠近，温柔得让你无法抗拒。她的指尖轻轻擦过你的手背，带来一阵战栗。",
+                mood:"mood-love",
+                choices:[
+                    {text:"接受她的靠近",next:"heartFall",love:17,sense:-4,danger:2,popup:"❤️ 姐姐内心：你接受我了，我们再也不要分开。"},
+                    {text:"轻轻躲开",next:"cold4",love:-9,sense:3,danger:11,popup:"⚠️ 姐姐内心：你躲开了我的触碰，我的心好痛。"},
+                    {text:"安静陪伴",next:"talk3",love:13,sense:-2,danger:1,popup:"❤️ 姐姐内心：这样安静陪着你，也很幸福。"}
+                ]
+            },
+            talk3:{
+                title:"心意渐明",
+                text:"她看着你，眼神认真而坚定：“我喜欢你，喜欢到想把你永远留在身边，谁也不能抢走。”",
+                mood:"mood-love",
+                choices:[
+                    {text:"我也喜欢你",next:"agreeLove",love:25,sense:-8,danger:5,popup:"❤️ 姐姐内心：你也喜欢我！我真的好幸福，好开心！"},
+                    {text:"我需要想想",next:"waitLove",love:10,sense:5,danger:12,popup:"⚠️ 姐姐内心：为什么要想？你应该立刻答应我！"},
+                    {text:"抱歉，我不能",next:"refuseLove",love:-30,sense:10,danger:35,popup:"⚠️ 姐姐内心：拒绝我？你会后悔的，你永远别想离开我。"}
+                ]
+            },
+            chat3:{
+                title:"温馨相处",
+                text:"相处越久，她对你的执念越深，她已经无法接受失去你。她的世界里，你是唯一的光，是她活下去的意义。",
+                mood:"mood-love",
+                choices:[
+                    {text:"愿意和她在一起",next:"agreeLove",love:23,sense:-7,danger:4,popup:"❤️ 姐姐内心：太好了，我们终于可以永远在一起了。"},
+                    {text:"保持朋友关系",next:"waitLove",love:8,sense:4,danger:15,popup:"⚠️ 姐姐内心：朋友？我不要做朋友，我要做你唯一的爱人。"},
+                    {text:"渐渐疏远",next:"cold5",love:-18,sense:6,danger:22,popup:"⚠️ 姐姐内心：疏远我？我不会让你如愿的。"}
+                ]
+            },
+            cold4:{
+                title:"不安加剧",
+                text:"你的冷淡让她不安，她的耐心一点点被消磨，危险气息越来越重，她眼底的温柔被偏执取代。",
+                mood:"mood-nervous",
+                choices:[
+                    {text:"主动缓和",next:"talk3",love:7,sense:-2,danger:10,popup:"❤️ 姐姐内心：你愿意缓和关系，我就知道你舍不得我。"},
+                    {text:"继续冷淡",next:"cold5",love:-22,sense:8,danger:28,popup:"⚠️ 姐姐内心：继续冷淡？那我只能用我的方式留住你了。"},
+                    {text:"温柔道歉",next:"shy3",love:11,sense:-1,danger:8,popup:"❤️ 姐姐内心：没关系，我原谅你，只要你回到我身边。"}
+                ]
+            },
+            cold5:{
+                title:"彻底冷漠",
+                text:"你彻底推开她，她脸上的温柔彻底破碎，只剩下偏执与疯狂。她看着你，眼神里没有温度，只有冰冷的占有欲。",
+                mood:"mood-mad",
+                choices:[
+                    {text:"后悔挽回",next:"talk3",love:5,sense:-4,danger:20,popup:"❤️ 姐姐内心：你后悔了，回来吧，我一直在等你。"},
+                    {text:"坚持远离",next:"refuseLove",love:-35,sense:12,danger:40,popup:"⚠️ 姐姐内心：坚持远离？那我只能把你永远锁在我身边了。"}
+                ]
+            },
+            waitLove:{
+                title:"犹豫不定",
+                text:"你的犹豫让她又疼又怒，她在耐心与疯狂之间挣扎，眼底的爱意和占有欲几乎要溢出来。",
+                mood:"mood-nervous",
+                choices:[
+                    {text:"最终接受",next:"agreeLove",love:18,sense:-6,danger:8,popup:"❤️ 姐姐内心：你接受我了！我们会永远幸福的！"},
+                    {text:"最终拒绝",next:"refuseLove",love:-32,sense:11,danger:38,popup:"⚠️ 姐姐内心：你还是拒绝了我，那我们就一起坠入深渊吧。"}
+                ]
+            },
+            heartFall:{
+                title:"心意沉沦",
+                text:"夕阳落下，夜幕降临，她将你带到僻静的河畔。晚风轻轻吹动她的发丝，她看着你，目光炽热而疯狂：“我好喜欢你，喜欢你到……可以放弃一切，包括我自己。”",
+                mood:"mood-love",
+                choices:[
+                    {text:"我愿意",next:"agreeLove",love:30,sense:-10,danger:6,popup:"❤️ 姐姐内心：我愿意！这三个字，是我听过最美的情话！"},
+                    {text:"我需要时间",next:"waitLove",love:12,sense:6,danger:14,popup:"⚠️ 姐姐内心：还要时间？我已经等不及要拥有你了。"},
+                    {text:"我不能接受",next:"refuseLove",love:-28,sense:9,danger:32,popup:"⚠️ 姐姐内心：不能接受？那我就强迫你接受。"}
+                ]
+            },
+            agreeLove:{
+                title:"确认关系",
+                text:"你接受了她，她激动地抱住你，力道紧得让你无法呼吸，仿佛要把你揉进自己的骨血里。她在你耳边轻声呢喃：“你是我的，永远都是。”",
+                mood:"mood-love",
+                choices:[
+                    {text:"全心依赖她",next:"ending4",love:35,sense:-15,danger:5,popup:"❤️ 姐姐内心：你依赖我，真好，我会永远守护你，宠爱你。"},
+                    {text:"想要私人空间",next:"ending1",love:-20,sense:10,danger:25,popup:"⚠️ 姐姐内心：私人空间？你想离开我？不可能。"},
+                    {text:"享受甜蜜",next:"ending2",love:20,sense:-12,danger:18,popup:"❤️ 姐姐内心：我们会一直甜蜜下去，直到永远。"}
+                ]
+            },
+            refuseLove:{
+                title:"拒绝告白",
+                text:"你拒绝了她，她所有温柔瞬间消失，眼神变得冰冷而疯狂。她笑了，笑声里带着绝望和偏执：“你以为，你能逃得掉吗？”",
+                mood:"mood-mad",
+                choices:[
+                    {text:"逃跑",next:"ending3",love:-25,sense:8,danger:42,popup:"⚠️ 姐姐内心：逃跑？你跑得再远，我也会把你找回来。"},
+                    {text:"坚持拒绝",next:"ending5",love:-40,sense:15,danger:50,popup:"⚠️ 姐姐内心：坚持拒绝？那我只能用最极端的方式，把你永远留在我身边。"}
+                ]
+            },
 
-            senseFailBE:{title:"坏结局·意识消散",text:"你的理智彻底崩溃，再也无法反抗，只能乖乖待在她身边，成为她唯一的所有物。你的思想、情绪、判断全部被她慢慢同化，你不再拥有自我，眼里只剩下她的身影。",mood:"mood-dark",diary:"【姐姐的私密爱意日记】\n夜深了，我的小孩安静靠在我怀里。我抚摸你柔软的发丝，看着你空洞却乖巧的眼神，心底满是满足。我知道这样不对，我知道我毁掉了你的理智、你的思考、你的自由。可我控制不住。从第一眼看见你，我就注定要把你占为己有。我不需要你聪明，不需要你独立，不需要你拥有除我之外的情绪。你只要乖乖依赖我、信任我、粘着我就够了。你的理智消散没关系，你的思想交给我就好。我会永远温柔抱着你，哪怕这份温柔沾满自私与罪孽。你是我的，永远逃不掉。",choices:[{text:"重新开始游戏",next:"restartGame"}]},
-            dangerExtremeBE:{title:"坏结局·永恒囚笼",text:"她彻底失控，将你永远禁锢。封闭的房间、隔绝的门窗、无人知晓的角落。这里没有外界、没有他人、没有逃离。她把所有疯狂全部释放，用最偏执的方式将你锁住。",mood:"mood-mad",diary:"【姐姐的私密爱意日记】\n你总是不懂我的爱。我一次次忍让，一次次克制，努力温柔、努力包容、努力做一个正常的爱人。可你偏偏要反抗、要逃离、要躲开我的视线。那我只能把你关起来。这间屋子安静、温暖、与世隔绝，没有人能打扰我们。我会给你最好的一切，美食、温暖、拥抱，唯独不给你自由。自由是最奢侈、最危险的东西，我不能让你拥有。别恨我，宝贝。我只是太过爱你，爱到无法容忍你离开我半步。这是我给你的，永恒的爱囚。",choices:[{text:"重新开始游戏",next:"restartGame"}]},
+            senseFailBE:{
+                title:"坏结局·意识消散",
+                text:"你的理智彻底崩溃，再也无法反抗，只能乖乖待在她身边，成为她唯一的所有物。你的思想、情绪、判断全部被她慢慢同化，你不再拥有自我，眼里只剩下她的身影。你温顺、听话、依赖，彻底沉沦在她温柔又病态的爱意牢笼之中，再也无法清醒。",
+                mood:"mood-dark",
+                diary:"【姐姐的极致爱意日记】\n夜深了，我的小孩安静靠在我怀里。我抚摸你柔软的发丝，看着你空洞却乖巧的眼神，心底满是满足与狂喜。我知道我很自私，我毁掉了你的理智、你的思考、你的自由，可我控制不住自己。从第一眼看见你的那一刻，我就注定要把你占为己有，注定要把你锁在我身边。我不需要你聪明，不需要你独立，不需要你拥有除我之外的任何情绪。你只要乖乖依赖我、信任我、粘着我就够了。你的理智消散没关系，你的思想交给我就好，你的人生由我来掌控。我会永远温柔抱着你，给你最好的一切，哪怕这份温柔沾满自私与罪孽。你是我的，从头到脚，从里到外，都是我的，永远逃不掉，永远别想离开。",
+                choices:[{text:"重新开始游戏",next:"restartGame"}]
+            },
+            dangerExtremeBE:{
+                title:"坏结局·永恒囚笼",
+                text:"她彻底失控，将你永远禁锢。封闭的房间、隔绝的门窗、无人知晓的角落。这里没有外界、没有他人、没有逃离。她把所有疯狂全部释放，用最偏执的方式将你锁住。你明白，从今往后，你属于她一个人，直到生命尽头，再也没有任何机会离开。",
+                mood:"mood-mad",
+                diary:"【姐姐的极致爱意日记】\n你总是不懂我的爱，总是一次次推开我，一次次想要逃离。我一次次忍让，一次次克制，努力温柔、努力包容、努力做一个正常的爱人。可你偏偏要反抗、要逃离、要躲开我的视线。那我只能把你关起来，用这种最极端的方式留住你。这间屋子安静、温暖、与世隔绝，没有人能打扰我们，没有人能把你从我身边抢走。我会给你最好的一切，美食、温暖、拥抱、无尽的宠爱，唯独不给你自由。自由是最奢侈、最危险的东西，我不能让你拥有，我不能冒着失去你的风险。别恨我，宝贝。我只是太过爱你，爱到无法容忍你离开我半步，爱到愿意为你背负一切骂名。这是我给你的，永恒的爱囚，是我对你最深沉、最偏执的爱意。",
+                choices:[{text:"重新开始游戏",next:"restartGame"}]
+            },
 
-            ending1:{title:"结局一：阴翳守望",text:"你选择离开，她没有强留，只是默默看着你。她不会打扰你的生活，却会永远跟在你身后，注视你的每一刻，守护你的每一天。你以为自由了，却不知道，你的世界始终被她笼罩。",mood:"mood-sad",diary:"【姐姐的私密爱意日记】\n今天你离开了我。我没有挽留，哪怕心脏痛到抽搐，指尖颤抖。我知道你渴望自由，我知道你讨厌束缚。那我放你走。我把阳光、人群、喧闹全部还给你。而我，只需要留在黑暗里看着你就够了。我记下你回家的时间、吃饭的口味、走路的步伐、微笑的弧度。我收藏你掉落的发丝、喝过的水杯、无意间留下的痕迹。我不会打扰你的生活，不会让你感到厌烦。只要你好好活着，只要我能看见你，我就满足。世人都说爱是占有，可我愿意把占有藏在阴影里。你是天上耀眼的月亮，而我，是永远追随你的黑影。永不靠近，永不离开。",choices:[{text:"重新开始游戏",next:"restartGame"}]},
-            ending2:{title:"结局二：专属挚爱",text:"你接受了她的全部，她把你宠成世界上最幸福的人。她为你拒绝所有异性，为你安排好一切，把所有温柔都给你。她的世界只有你，她也要求你的世界只有她。",mood:"mood-love",diary:"【姐姐的私密爱意日记】\n我们结婚了。红色的证书，安静的小屋，属于我们两个人的世界。我终于完完全全拥有你。我会为你做饭、为你洗衣、为你处理所有麻烦。你不需要接触复杂的人群，不需要面对世俗的恶意。有我在，我会挡住世间所有风雨。代价是——你的一切只能属于我。我贪恋你的呼吸、你的体温、你的依赖。我承认我自私、偏执、占有欲爆棚。可我愿意把世间最温柔的一切全部赠予你。甜蜜的枷锁最是牢固，温柔的牢笼最是难挣脱。愿你永远留在我怀里，做我一辈子的专属挚爱。",choices:[{text:"重新开始游戏",next:"restartGame"}]},
-            ending3:{title:"结局三：温柔囚爱",text:"你逃跑失败，被她轻轻带回。她没有责怪、没有发怒、没有呵斥。她只是温柔抱住颤抖的你，一遍又一遍告诉你不要害怕。她隔绝外界所有诱惑，断掉你的社交，封闭你的出行。",mood:"mood-mad",diary:"【姐姐的私密爱意日记】\n你逃跑的那一刻，我的心跳几乎停止。恐惧吞噬了我的理智，我害怕再也见不到你。所以我把你带回来了。别怕，我不会伤害你。我给你温暖、给你拥抱、给你一切你想要的温柔。只是，我再也不会允许你离开我身边。外面的世界太嘈杂、太危险、太肮脏。只有我这里，才是你最安全的避风港。哪怕方式极端，哪怕爱意扭曲。我只想把你好好藏起来，只属于我一个人。我会用一辈子温柔，弥补这份禁锢带来的不安。我爱你，爱到愿意背负一切骂名。",choices:[{text:"重新开始游戏",next:"restartGame"}]},
-            ending4:{title:"结局四：双向救赎",text:"你用真心融化她的偏执，她用爱意守护你的余生。她收敛疯狂，学会尊重；你放下不安，全心信任。你们彼此治愈，彼此依靠。她不再极端，你不再害怕。",mood:"mood-love",diary:"【姐姐的私密爱意日记】\n因为你，我变成了更好的人。我收起了锋利的棱角，压下了疯狂的执念，学会了温柔，学会了尊重，学会了用正常的方式去爱你。你治愈了我残缺不安的灵魂，你是我黑暗生命里唯一的光。我会用最温柔的方式爱你，用最坚定的心守护你。我们的爱不是束缚，不是占有，不是囚禁，而是救赎，是陪伴，是一辈子的不离不弃。谢谢你来到我身边，谢谢你愿意爱我。往后余生，风雪是你，平淡是你，温柔也是你。",choices:[{text:"重新开始游戏",next:"restartGame"}]},
-            ending5:{title:"结局五：极致占有",text:"你彻底激怒了她，她不再压抑本性，将你完全占有。她摧毁你身边的一切，只留下她自己。她爱你爱到病态，爱到疯狂，爱到愿意为你毁掉全世界。",mood:"mood-mad",diary:"【姐姐的私密爱意日记】\n你是我的，只能是我的。任何人都不能碰，任何人都不能抢，任何人都不能靠近。我为你拒绝全世界，为你放弃所有社交，为你变得偏执疯狂。你可以恨我，可以怨我，可以讨厌我，但绝对不能离开我。我会折断你的翅膀，断掉你的退路，隔绝你的所有。我爱你爱到病态，爱到疯狂，爱到失去理智，爱到愿意为你付出一切，哪怕是坠入深渊。你是我的命，是我的光，是我的一切，是我永生永世都不会放手的唯一。",choices:[{text:"重新开始游戏",next:"restartGame"}]}
+            ending1:{
+                title:"结局一：阴翳守望",
+                text:"你选择离开，她没有强留，只是默默看着你。她不会打扰你的生活，却会永远跟在你身后，注视你的每一刻，守护你的每一天。你以为自由了，却不知道，你的世界始终被她笼罩。她记得你的作息，记得你的路线，记得你所有喜好。她不会出现，却无处不在。街角、楼下、路口、阴影，永远有一道深情又阴郁的目光凝视着你。你活在阳光之下，她藏在黑暗之中，默默守护，默默执念，永不放手。",
+                mood:"mood-sad",
+                diary:"【姐姐的守望爱意日记】\n今天你离开了我，选择去追寻你想要的自由。我没有挽留，哪怕心脏痛到抽搐，指尖颤抖到无法控制。我知道你渴望自由，我知道你讨厌束缚，那我放你走，把阳光、人群、喧闹全部还给你。而我，只需要留在黑暗里，默默看着你就够了。我记下你回家的时间、吃饭的口味、走路的步伐、微笑的弧度，收藏你掉落的发丝、喝过的水杯、无意间留下的所有痕迹。我不会打扰你的生活，不会让你感到厌烦，不会出现在你面前给你压力。只要你好好活着，只要我能看见你，只要你平安快乐，我就满足。世人都说爱是占有，可我愿意把占有藏在阴影里。你是天上耀眼的月亮，而我，是永远追随你的黑影，永不靠近，永不离开，永生永世，默默守护你。",
+                choices:[{text:"重新开始游戏",next:"restartGame"}]
+            },
+            ending2:{
+                title:"结局二：专属挚爱",
+                text:"你接受了她的全部，她把你宠成世界上最幸福的人。她为你拒绝所有异性，为你安排好一切，把所有温柔都给你。她的世界只有你，她也要求你的世界只有她。你们结婚，拥有小家，温馨又封闭。她包揽所有琐事，照顾你的衣食住行，把你呵护成无法离开她的小孩。偏执、温柔、占有、宠溺交织在一起，你被困在甜蜜的牢笼里，心甘情愿，永不离开。",
+                mood:"mood-love",
+                diary:"【姐姐的专属爱意日记】\n我们结婚了，红色的证书，温暖的小屋，属于我们两个人的完美世界。我终于完完全全拥有你，终于可以把你藏在我身边，一辈子不分开。我会为你做饭、为你洗衣、为你处理所有麻烦，为你挡住世间所有风雨。你不需要接触复杂的人群，不需要面对世俗的恶意，不需要承受任何委屈。有我在，你永远都是被宠爱的小孩。代价是——你的一切只能属于我，你的目光只能看着我，你的心只能装着我。我贪恋你的呼吸、你的体温、你的依赖，我承认我自私、偏执、占有欲爆棚。可我愿意把世间最温柔、最美好的一切全部赠予你。甜蜜的枷锁最是牢固，温柔的牢笼最是难挣脱。愿你永远留在我怀里，做我一辈子的专属挚爱，永生永世，只属于我一个人。",
+                choices:[{text:"重新开始游戏",next:"restartGame"}]
+            },
+            ending3:{
+                title:"结局三：温柔囚爱",
+                text:"你逃跑失败，被她轻轻带回。她没有责怪、没有发怒、没有呵斥。她只是温柔抱住颤抖的你，一遍又一遍告诉你不要害怕。她隔绝外界所有诱惑，断掉你的社交，封闭你的出行。她给你柔软的床铺、温暖的灯光、无限的陪伴。温柔是她的锁链，宠溺是她的牢笼。你明明被囚禁，却沉溺在她温柔的爱意里，慢慢妥协，慢慢依赖，再也不想逃离。",
+                mood:"mood-mad",
+                diary:"【姐姐的温柔囚爱日记】\n你逃跑的那一刻，我的心跳几乎停止，恐惧吞噬了我的全部理智，我害怕再也见不到你，害怕永远失去你。所以我把你带回来了，别怕，我不会伤害你，不会责怪你，只会给你更多的温柔与宠爱。我给你温暖、给你拥抱、给你一切你想要的温柔，给你一个安全又温暖的港湾。只是，我再也不会允许你离开我身边，再也不会给你逃跑的机会。外面的世界太嘈杂、太危险、太肮脏，只有我这里，才是你最安全的归宿。哪怕方式极端，哪怕爱意扭曲，我只想把你好好藏起来，只属于我一个人。我会用一辈子的温柔，弥补这份禁锢带来的不安，用一辈子的爱意，把你宠成最幸福的人。我爱你，爱到愿意背负一切骂名，爱到愿意为你放弃全世界。",
+                choices:[{text:"重新开始游戏",next:"restartGame"}]
+            },
+            ending4:{
+                title:"结局四：双向救赎",
+                text:"你用真心融化她的偏执，她用爱意守护你的余生。她收敛疯狂，学会尊重；你放下不安，全心信任。你们彼此治愈，彼此依靠。她不再极端，你不再害怕。毕业后你们顺利结婚，不久生下一个乖巧可爱的女儿。她把所有温柔都留给你和孩子，一家人安稳幸福，甜蜜相守，成为了彼此生命中最珍贵的光。",
+                mood:"mood-love",
+                diary:"【姐姐的救赎爱意日记】\n因为你，我变成了更好的人。我收起了锋利的棱角，压下了疯狂的执念，学会了温柔，学会了尊重，学会了用正常、健康的方式去爱你。你治愈了我残缺不安的灵魂，你是我黑暗生命里唯一的光，是我活下去的全部意义。我会用最温柔的方式爱你，用最坚定的心守护你，用一辈子的时间陪伴你。我们的爱不是束缚，不是占有，不是囚禁，而是救赎，是陪伴，是一辈子的不离不弃，是双向奔赴的美好。谢谢你来到我身边，谢谢你愿意爱我，谢谢你治愈了我。往后余生，风雪是你，平淡是你，温柔是你，幸福是你。我会永远爱你，守护你，和你一起，看着我们的孩子长大，一起走完这一生，下辈子，下下辈子，我还要和你在一起。",
+                choices:[{text:"重新开始游戏",next:"restartGame"}]
+            },
+            ending5:{
+                title:"结局五：极致占有",
+                text:"你坚决拒绝她，彻底击碎了她最后的理智。她不择手段拆散你身边所有人，折断你所有退路，用最疯狂、最偏执的方式将你完全占有。她爱你爱到病态，爱到疯狂，爱到愿意为你毁掉全世界，也愿意为你，把你永远锁在身边，成为她唯一的、永恒的所有物。",
+                mood:"mood-mad",
+                diary:"【姐姐的极致占有日记】\n你是我的，只能是我的，从头到脚，从里到外，永生永世，只能属于我一个人。任何人都不能碰，任何人都不能抢，任何人都不能靠近你半步。我为你拒绝全世界，为你放弃所有社交，为你变得偏执疯狂，为你愿意坠入深渊。你可以恨我，可以怨我，可以讨厌我，可以骂我病态，但绝对不能离开我，绝对不能爱上别人。我会折断你的翅膀，断掉你的退路，隔绝你的所有社交，毁掉你身边的一切，只留下我一个人。我爱你爱到病态，爱到疯狂，爱到失去理智，爱到愿意为你付出一切，哪怕是生命，哪怕是罪孽。你是我的命，是我的光，是我的一切，是我永生永世都不会放手的唯一。这辈子，下辈子，下下辈子，你都只能是我的，永远别想逃离。",
+                choices:[{text:"重新开始游戏",next:"restartGame"}]
+            }
         };
 
         function restartGame(){
             loveValue=50; senseValue=60; dangerValue=30;
-            updateStatus(); currentScene="start"; updateScene();
+            currentScene="start"; updateScene();
         }
 
         function updateScene(){
@@ -427,6 +523,8 @@
             document.body.className = s.mood;
             document.getElementById("title").innerText = s.title;
             document.getElementById("text").innerText = s.text + (s.diary ? "\n\n"+s.diary : "");
+            updateHeartAnimation();
+
             let box = document.getElementById("choices");
             box.innerHTML = "";
             s.choices.forEach(c=>{
@@ -437,7 +535,7 @@
                     if(c.love!==undefined) loveValue=Math.max(0,Math.min(100,loveValue+c.love));
                     if(c.sense!==undefined) senseValue=Math.max(0,Math.min(100,senseValue+c.sense));
                     if(c.danger!==undefined) dangerValue=Math.max(0,Math.min(100,dangerValue+c.danger));
-                    updateStatus();
+
                     if(c.popup){ pendingScene=c.next; showPopup(c.popup); }
                     else{ currentScene=c.next; updateScene(); }
                 };
@@ -445,7 +543,7 @@
             });
         }
 
-        window.onload=()=>{updateStatus(); updateScene();}
+        window.onload=()=>{ updateScene(); }
     </script>
 </body>
 </html>
