@@ -68,12 +68,12 @@
             color: #fff;
         }
         .mood-normal {background:#120808;}
-        .mood-dark {background:#0a0404;}
+        .mood-dark {background:#0a0408;}
         .mood-nervous {background:#190808;}
-        .mood-mad {background:#1d0505;}
-        .mood-sad {background:#0d0606;}
-        .mood-love {background:#160707;}
-        .love-word{color:#ff7777;font-weight:bold;margin-top:15px;line-height:2}
+        .mood-mad {background:#1d0808;}
+        .mood-sad {background:#0d0808;}
+        .mood-love {background:#160808;}
+        .love-word{color:#ff7777;font-weight:bold;margin-top:15px;line-height:2;white-space:pre-wrap;}
 
         .popup {
             position: fixed;
@@ -130,7 +130,7 @@
     <div class="game-container">
         <h1 class="scene-title" id="title"></h1>
         <p class="scene-text" id="text"></p>
-        <div class="choices" id="choices"></div>
+        <div id="choices"></div>
     </div>
 
     <script>
@@ -138,12 +138,11 @@
         let pendingScene = null;
 
         function showPopup(text) {
-            const popupTextEl = document.getElementById("popupText");
-            if (popupTextEl) {
-                popupTextEl.innerText = text || "";
-            }
+            const el = document.getElementById("popupText");
+            if (el) el.innerText = text || "";
             document.getElementById("popup").classList.add("show");
         }
+
         function closePopup() {
             document.getElementById("popup").classList.remove("show");
             if (pendingScene) {
@@ -170,10 +169,10 @@
                 text: "你停下脚步轻声作答，姐姐魅惑的眼眸之中瞬间漾开浅浅笑意，语调轻柔舒缓，细细询问着你的日常作息、兴趣喜好与生活琐事。温柔表象之下，是早已疯狂滋生的占有欲。",
                 mood: "mood-love",
                 choices: [
-                    { text: "坦然诉说自己全部喜好", next: "knowMore", popup: "你的一切……我都会牢牢刻在心里。" },
-                    { text: "简单敷衍不愿过多交谈", next: "perfunctory", popup: "你在敷衍我……是吗？" },
-                    { text: "主动反问喜好拉近关系", next: "mutualTalk" },
-                    { text: "借口有事匆忙抽身离开", next: "wantLeave" }
+                    { text: "坦然诉说自己全部喜好", next: "heartFall", popup: "你的一切……我都会牢牢刻在心里。" },
+                    { text: "简单敷衍不愿过多交谈", next: "heartFall", popup: "你在敷衍我……是吗？" },
+                    { text: "主动反问喜好拉近关系", next: "heartFall" },
+                    { text: "借口有事匆忙抽身离开", next: "meetCold" }
                 ]
             },
             meetTalk2: {
@@ -181,10 +180,10 @@
                 text: "你脸颊微红低头垂眸，不敢与眼前美艳姐姐对视，这般青涩羞怯模样，让她心底偏执愈发浓重。",
                 mood: "mood-love",
                 choices: [
-                    { text: "鼓起勇气抬头直视双眸", next: "eyeLove", popup: "你的眼睛……真好看，我好想一直看着。" },
-                    { text: "依旧低头沉默不言不语", next: "silentShy" },
-                    { text: "小声低语简单回应几句", next: "softReply" },
-                    { text: "慌乱失神转身快步逃离", next: "flusterRun", popup: "跑什么？你以为……跑得掉吗？" }
+                    { text: "鼓起勇气抬头直视双眸", next: "heartFall", popup: "你的眼睛……真好看，我好想一直看着。" },
+                    { text: "依旧低头沉默不言不语", next: "heartFall" },
+                    { text: "小声低语简单回应几句", next: "heartFall" },
+                    { text: "慌乱失神转身快步逃离", next: "meetCold", popup: "跑什么？你以为……跑得掉吗？" }
                 ]
             },
             meetCold: {
@@ -192,9 +191,9 @@
                 text: "你神色淡漠无视对方，径直从她身旁擦肩而过。姐姐脸上温润笑意瞬间消散，周身空气骤然变冷，阴冷压抑的气息缓缓蔓延开来。",
                 mood: "mood-nervous",
                 choices: [
-                    { text: "行走途中忍不住回头张望", next: "lookBack", popup: "你还是在意我的……对吧？" },
-                    { text: "全然无视头也不回向前走", next: "ignoreAll", popup: "没关系，我会让你再也离不开我。" },
-                    { text: "内心慌乱不安放慢脚步", next: "uneasySlow" }
+                    { text: "行走途中忍不住回头张望", next: "heartFall", popup: "你还是在意我的……对吧？" },
+                    { text: "全然无视头也不回向前走", next: "heartFall", popup: "没关系，我会让你再也离不开我。" },
+                    { text: "内心慌乱不安放慢脚步", next: "heartFall" }
                 ]
             },
             meetChat: {
@@ -202,20 +201,10 @@
                 text: "你鼓起勇气主动上前开启话题，姐姐先是微微一怔，随即展露偏执又温柔的笑意，细致回应你的每一句话。",
                 mood: "mood-love",
                 choices: [
-                    { text: "相约闲暇之时一同散步", next: "makeAnAppointment", popup: "和我约定……太好了，真的太好了。" },
-                    { text: "闲谈结束礼貌道别分开", next: "politePart", popup: "这么快就想走吗……我还没看够你。" },
-                    { text: "委婉询问对方感情状态", next: "askSingle" },
-                    { text: "提议结伴沿街漫步吹风", next: "walkTogether" }
-                ]
-            },
-            eyeLove: {
-                title: "目光相融 · 心动沦陷",
-                text: "你鼓起勇气抬眸与她四目相对，澄澈眼眸两两相撞的瞬间，她眼底翻涌着病态又浓烈的爱意。",
-                mood: "mood-love",
-                choices: [
-                    { text: "深陷心动彻底沉沦其中", next: "heartFall", popup: "就这样……看着我，只准看着我。" },
-                    { text: "慌乱羞涩连忙移开视线", next: "shyAwayEye" },
-                    { text: "镇定从容依旧静静对视", next: "calmStare" }
+                    { text: "相约闲暇之时一同散步", next: "heartFall", popup: "和我约定……太好了，真的太好了。" },
+                    { text: "闲谈结束礼貌道别分开", next: "heartFall", popup: "这么快就想走吗……我还没看够你。" },
+                    { text: "委婉询问对方感情状态", next: "heartFall" },
+                    { text: "提议结伴沿街漫步吹风", next: "heartFall" }
                 ]
             },
             heartFall: {
@@ -224,9 +213,8 @@
                 mood: "mood-love",
                 choices: [
                     { text: "满心欢喜点头答应交往", next: "agreeLove", popup: "你是我的……从今天起，完完全全是我的。" },
-                    { text: "内心犹豫迟迟无法决断", next: "hesitateLove", popup: "没关系，我可以等……等到你属于我。" },
-                    { text: "委婉拒绝只想维持朋友", next: "refuseConfess", popup: "拒绝我？你知道这是什么下场吗？" },
-                    { text: "羞涩沉默默认接受心意", next: "silentAgree" }
+                    { text: "内心犹豫迟迟无法决断", next: "agreeLove", popup: "没关系，我可以等……等到你属于我。" },
+                    { text: "委婉拒绝只想维持朋友", next: "refuseConfess", popup: "拒绝我？你知道这是什么下场吗？" }
                 ]
             },
             agreeLove: {
@@ -249,91 +237,71 @@
                 ]
             },
 
-            // ========== 你要的 5 个结局 ==========
+            // 5个完美结局
             ending1: {
                 title: "结局一：阴翳视奸",
                 text: "你强硬提出分开，执意摆脱她的束缚。她没有疯狂纠缠，只是安静松开手，眼底一片死寂。你以为自己终于逃离了她的掌控，回归正常生活。可你永远不会知道，从你离开她的那一刻起，她便躲在阴暗角落，无声注视你的一切。窗外、街角、路灯阴影里，总有一道视线死死锁住你。她不打扰、不靠近，却永远不会放过你。",
                 mood: "mood-sad",
                 loveEnding: "【病娇姐姐爱意独白】\n我不会强迫你留在我身边，我的小孩。既然你想要自由，那我就给你自由。但你要记住，你的一举一动、一颦一笑，永远逃不开我的视线。我会藏在黑暗里，永远注视、永远贪婪、永远爱着你。你是我此生唯一的执念，哪怕只能隔着距离凝望，我也绝不会放手。",
-                choices: [{ text: "重新开启全新剧情", next: "restart" }]
+                choices: [{ text: "重新开启全新剧情", next: "start" }]
             },
             ending2: {
                 title: "结局二：强制婚姻",
                 text: "你无力反抗她的偏执占有，最终被她彻底掌控。她动用所有手段压下你的反抗，不顾你的意愿，强行与你登记结婚。婚后你被困在安静压抑的房子里，没有社交、没有自由。没过多久，你生下了一个眉眼像她的女儿。日子平淡又麻木，你永远被困在这场没有选择权的婚姻里，一辈子无法逃离。",
                 mood: "mood-dark",
                 loveEnding: "【病娇姐姐爱意独白】\n我不需要你爱我，只要你属于我就够了。婚姻、家庭、孩子，我把所有枷锁全部套在你身上。你逃不掉，也走不了。平淡也好，麻木也罢，这辈子、下辈子，你都必须留在我身边。女儿是我们最好的羁绊，是我锁住你一辈子的链子。我疯狂、偏执、卑劣，可我唯独对你，爱的至死不渝。",
-                choices: [{ text: "重新开启全新剧情", next: "restart" }]
+                choices: [{ text: "重新开启全新剧情", next: "start" }]
             },
             ending3: {
                 title: "结局三：绑架囚爱",
                 text: "你拒绝告白后慌忙逃跑，可她早已布下天罗地网。当晚，你被她强行带走，关进密闭偏僻的小屋。没有外人，没有求救，只有她疯狂又温柔的偏执。她强行占有你，用最极端的方式让你彻底属于她。黑暗之中，她一遍遍亲吻你的泪痕，偏执呢喃永远不会放你离开。",
                 mood: "mood-mad",
                 loveEnding: "【病娇姐姐爱意独白】\n既然温柔留不住你，那我就用黑暗困住你。我不在乎别人怎么看，不在乎手段是否肮脏。我只要你完完整整、干干净净的属于我一个人。强行占有、囚禁、束缚，哪怕你恨我，我也绝不松手。你是我的毒药，也是我的救赎，为了你，我愿意坠入深渊永不回头。",
-                choices: [{ text: "重新开启全新剧情", next: "restart" }]
+                choices: [{ text: "重新开启全新剧情", next: "start" }]
             },
             ending4: {
                 title: "结局四：救赎圆满",
                 text: "某次意外事故，你身陷危险，所有人都犹豫后退，唯独她不顾一切冲上来护住你。鲜血落在她白皙的皮肤上，那一刻你彻底明白，她的偏执全部源于深爱。你主动答应她的告白，愿意接纳她所有疯狂。毕业后你们顺利结婚，不久生下一个乖巧可爱的女儿。她收敛极端本性，把所有温柔尽数留给你，一家人安稳幸福，甜蜜相守。",
                 mood: "mood-love",
                 loveEnding: "【病娇姐姐爱意独白】\n谢谢你愿意看懂我的疯狂、接纳我的阴暗。为了你，我可以戒掉偏执、收敛戾气。我会做最温柔的爱人，做最可靠的家人。我会守护你、守护女儿、守护我们的家。这一世安稳，余生温柔，我把全部纯粹又炙热的爱意，通通只给你一个人。",
-                choices: [{ text: "重新开启全新剧情", next: "restart" }]
+                choices: [{ text: "重新开启全新剧情", next: "start" }]
             },
             ending5: {
                 title: "结局五：崩坏掠夺",
                 text: "你坚决拒绝她，随后意外车祸住院。温柔学妹细心照料你，你们慢慢互生情愫，确定恋爱关系。这件事彻底击碎了她最后的理智。雨夜，她强行拆散你们，在冰冷的房间里粗暴占有你。她不择手段让你怀上女儿，用孩子彻底捆住你的一生。你失去爱人、失去自由，永远被她囚禁在身边。",
                 mood: "mood-mad",
                 loveEnding: "【病娇姐姐爱意独白】\n别人不配喜欢你，只有我才能够拥有你。学妹的温柔、外人的善意，在我眼里全部都是肮脏的掠夺。我毁掉你的爱情、折断你的羽翼、占有你的身体，我用孩子锁住你的余生。你恨我也好、厌恶我也罢，这辈子你只能留在我怀里。我扭曲、病态、罪孽深重，但我对你的爱，绝对真心。",
-                choices: [{ text: "重新开启全新剧情", next: "restart" }]
-            },
-
-            // 过渡剧情
-            knowMore:{title:"熟记喜好 · 暗中筹备",text:"你毫无防备诉说着自己的爱好习惯，姐姐尽数牢记于心，默默在心底谋划着靠近你的种种方式。",mood:"mood-normal",choices:[{text:"视作缘分坦然安心接受",next:"believeFate"},{text:"刻意改变喜好刻意避开",next:"changeLike"}]},
-            hesitateLove:{title:"犹豫迟疑 · 耐心蛰伏等待",text:"面对真挚告白你内心摇摆不定，迟迟没有给出明确答复。姐姐没有丝毫逼迫催促，依旧保持偏执温柔默默守候。",mood:"mood-normal",choices:[{text:"日久生情慢慢接受心意",next:"slowAccept"},{text:"深思熟虑最终选择拒绝",next:"finalRefuse"}]},
-            silentAgree:{title:"沉默接受 · 甜蜜热恋开启",text:"你面颊羞涩沉默不语，这般模样已然默认接纳了她的告白心意。",mood:"mood-love",choices:[{text:"愿意一直陪在她身边",next:"ending4"},{text:"无法接受偏执选择离开",next:"ending1"}]}
+                choices: [{ text: "重新开启全新剧情", next: "start" }]
+            }
         };
 
-        function goToScene(sceneId, popupText) {
-            if (sceneId === "restart") {
-                currentScene = "start";
-                updateScene();
-                return;
-            }
-            if (popupText) {
-                pendingScene = sceneId;
-                showPopup(popupText);
-            } else {
-                currentScene = sceneId;
-                updateScene();
-            }
-        }
-
         function updateScene() {
-            const scene = scenes[currentScene];
-            const bodyBg = document.getElementById("bodyBg");
-            const titleDom = document.getElementById("title");
-            const textDom = document.getElementById("text");
-            const choicesDom = document.getElementById("choices");
+            const s = scenes[currentScene];
+            document.body.className = s.mood;
+            document.getElementById("title").innerText = s.title;
+            document.getElementById("text").innerText = s.text;
 
-            bodyBg.className = scene.mood;
-            titleDom.textContent = scene.title;
-            if (scene.loveEnding) {
-                textDom.innerHTML = scene.text + `<br><br><span class="love-word">${scene.loveEnding}</span>`;
-            } else {
-                textDom.textContent = scene.text;
-            }
-            choicesDom.innerHTML = "";
-            scene.choices.forEach(choice => {
+            const box = document.getElementById("choices");
+            box.innerHTML = "";
+
+            s.choices.forEach(c => {
                 const btn = document.createElement("button");
-                btn.className = choice.next === "restart" ? "choice-btn end-btn" : "choice-btn";
-                btn.textContent = choice.text;
-                btn.onclick = () => goToScene(choice.next, choice.popup);
-                choicesDom.appendChild(btn);
+                btn.className = c.next === "start" ? "choice-btn end-btn" : "choice-btn";
+                btn.innerText = c.text;
+                btn.onclick = () => {
+                    if (c.popup) {
+                        pendingScene = c.next;
+                        showPopup(c.popup);
+                    } else {
+                        currentScene = c.next;
+                        updateScene();
+                    }
+                };
+                box.appendChild(btn);
             });
         }
 
-        window.onload = function() {
-            updateScene();
-        }
+        window.onload = updateScene;
     </script>
 </body>
 </html>
