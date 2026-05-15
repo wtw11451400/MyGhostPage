@@ -2,8 +2,8 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>他的专属玩具 · 病娇恋爱互动</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>偏执爱意 · 病娇恋爱全篇</title>
     <style>
         * {
             margin: 0;
@@ -16,12 +16,10 @@
             font-family: "Microsoft YaHei", sans-serif;
             line-height: 1.9;
             min-height: 100vh;
-            transition: all 0.8s ease;
-            padding: 20px;
+            padding: 18px;
             position: relative;
             overflow-x: hidden;
         }
-        /* 病娇文字效果容器 */
         .text-overlay {
             position: fixed;
             top: 0;
@@ -34,649 +32,339 @@
         }
         .text-overlay span {
             position: absolute;
-            font-size: 18px;
+            font-size: 17px;
             font-weight: bold;
             opacity: 0;
-            transition: opacity 0.6s ease;
+            transition: opacity 0.5s ease;
             white-space: nowrap;
         }
-        .text-overlay.red { color: #ff3333; }
-        .text-overlay.black { color: #000; }
-        /* 开场动画遮罩 */
-        #startLoader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
-            transition: opacity 1.2s ease, transform 1.2s ease;
-        }
-        .loader-text {
-            color: #ff5555;
-            font-size: 26px;
-            letter-spacing: 6px;
-            animation: breath 2s infinite ease-in-out;
-        }
-        @keyframes breath {
-            0%,100% {opacity:0.4; transform: scale(1);}
-            50% {opacity:1; transform: scale(1.05);}
-        }
-        .fade-out {
-            opacity: 0 !important;
-            pointer-events: none;
-            transform: scale(1.1);
-        }
-        /* 主容器 */
+        .text-overlay.red { color: #ff3a3a; text-shadow:0 0 6px #ff2222; }
+        .text-overlay.black { color: #000; text-shadow:0 0 4px #440000; }
         .game-container {
             max-width: 620px;
             width: 100%;
             margin: 0 auto;
             background: #140a0a;
-            padding: 35px 25px;
+            padding: 30px 22px;
             border-radius: 14px;
-            box-shadow: 0 0 40px rgba(180,0,0,0.45);
-            border: 1px solid #551111;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 1s ease, transform 1s ease;
+            box-shadow: 0 0 45px rgba(190,0,0,0.5);
+            border: 1px solid #5c1515;
             position: relative;
             z-index: 10;
         }
-        .show-container {
-            opacity: 1;
-            transform: translateY(0);
-        }
         .scene-title {
-            color: #ff6060;
-            font-size: 24px;
-            margin-bottom: 22px;
+            color: #ff6363;
+            font-size: 23px;
+            margin-bottom: 20px;
             text-align: center;
-            text-shadow: 0 0 12px rgba(255,80,80,0.6);
-            opacity: 0;
-            transition: opacity 0.7s ease;
+            text-shadow: 0 0 10px rgba(255,70,70,0.55);
         }
-        .scene-title.show {opacity:1;}
         .scene-text {
-            margin-bottom: 35px;
-            font-size: 16px;
-            min-height: 200px;
-            opacity: 0;
-            transition: opacity 0.8s ease;
+            margin-bottom: 32px;
+            font-size: 15.5px;
+            min-height: 220px;
         }
-        .scene-text.show {opacity:1;}
-        .choices {
-            opacity: 0;
-            transition: opacity 0.9s ease;
-        }
-        .choices.show {opacity:1;}
         .choice-btn {
             display: block;
             width: 100%;
-            padding: 16px;
-            margin: 12px 0;
-            background: #251212;
-            color: #ddd;
-            border: 1px solid #4a2222;
-            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            background: #271313;
+            color: #e2d0d0;
+            border: 1px solid #4e2424;
+            border-radius: 9px;
             cursor: pointer;
-            font-size: 15px;
-            transition: all 0.4s ease;
-            position: relative;
-            z-index: 10;
+            font-size: 14.8px;
+            transition: all 0.35s ease;
         }
-        .choice-btn:hover {
-            background: #3a1a1a;
-            border-color: #ff6666;
-            color: #ff7777;
-            letter-spacing: 1px;
+        .choice-btn:active {
+            background: #401c1c;
+            border-color: #ff5555;
+            color: #ff8080;
         }
         .end-btn {
-            background: #bb2222;
-            border-color: #dd3333;
+            background: #b82020;
+            border-color: #d62e2e;
             color: #fff;
         }
-        .end-btn:hover {
-            background: #dd3333;
-        }
-        /* 场景氛围变色 */
         .mood-normal {background:#120808;}
-        .mood-dark {background:#0b0505;}
-        .mood-nervous {background:#1a0909;}
-        .mood-mad {background:#1f0606;}
-        .mood-sad {background:#0e0707;}
+        .mood-dark {background:#0a0404;}
+        .mood-nervous {background:#190808;}
+        .mood-mad {background:#1d0505;}
+        .mood-sad {background:#0d0606;}
+        .mood-love {background:#160707;}
+        .love-word{color:#ff7777;font-weight:bold;margin-top:15px;line-height:2}
     </style>
 </head>
 <body id="bodyBg">
-    <!-- 病娇文字覆盖层 -->
     <div class="text-overlay" id="textOverlay"></div>
-
-    <!-- 开场动画 -->
-    <div id="startLoader">
-        <div class="loader-text">正在坠入他的温柔牢笼...</div>
-    </div>
-
-    <div class="game-container" id="gameBox">
+    <div class="game-container">
         <h1 class="scene-title" id="title"></h1>
         <p class="scene-text" id="text"></p>
         <div class="choices" id="choices"></div>
     </div>
 
     <script>
-        // 病娇文字库
         const sickTexts = {
-            red: ["我爱你", "你只能是我的", "别离开我", "我好难过", "你是故意的吗", "为什么不理我"],
-            black: ["@#￥%", "&*^^", "#￥%……", "@*&%", "……&*", "%^&*"]
+            redLove: [
+                "满心满眼皆是你",
+                "此生只想独占你",
+                "余生岁岁陪着你",
+                "不准离开我半步",
+                "你是我的唯一执念",
+                "把你牢牢拥入怀中",
+                "只许对我一人温柔",
+                "我的爱意只赠予你",
+                "想将你私藏一辈子",
+                "心跳全部为你而动",
+                "靠近我，别再走远",
+                "这辈子都别想挣脱我"
+            ],
+            blackMad: [
+                "你为何总是敷衍我",
+                "不许对别人展露笑容",
+                "你的心思只能属于我",
+                "疏远我只会激怒我",
+                "别试图逃离我的视线",
+                "我不允许任何人靠近你",
+                "你的一举一动我都知晓",
+                "违背我只会付出代价",
+                "不要挑战我的耐心",
+                "我得不到也不会放手"
+            ]
         };
 
-        // 生成随机文字效果
-        function spawnTextEffect(type, count = 3) {
+        function spawnTextEffect(type, count = 6, customText = null) {
             const overlay = document.getElementById("textOverlay");
+            const textPool = customText ? [customText] : (type === "red" ? sickTexts.redLove : sickTexts.blackMad);
             for (let i = 0; i < count; i++) {
                 setTimeout(() => {
                     const span = document.createElement("span");
-                    span.className = type;
-                    const textArr = sickTexts[type];
-                    span.textContent = textArr[Math.floor(Math.random() * textArr.length)];
-                    span.style.left = Math.random() * 100 + "%";
-                    span.style.top = Math.random() * 100 + "%";
+                    span.className = type === "red" ? "red" : "black";
+                    span.textContent = textPool[Math.floor(Math.random() * textPool.length)];
+                    span.style.left = Math.random() * 96 + "%";
+                    span.style.top = Math.random() * 96 + "%";
                     overlay.appendChild(span);
-                    // 渐入效果
-                    setTimeout(() => span.style.opacity = 1, 10);
-                    // 5秒后渐出移除
+                    setTimeout(() => span.style.opacity = 1, 15);
                     setTimeout(() => {
                         span.style.opacity = 0;
-                        setTimeout(() => span.remove(), 600);
-                    }, 5000);
-                }, i * 200);
+                        setTimeout(() => span.remove(), 700);
+                    }, 6500);
+                }, i * 130);
             }
         }
 
-        // 全部完善剧情+多分支+情景氛围绑定（加入文字触发标记）
         const scenes = {
             start: {
-                title: "序章 · 图书馆的初遇",
-                text: "午后的图书馆光线昏暗，落叶透过窗棂落在书页上。你低头翻书时，一道干净温柔的身影停在你桌旁。少年眉眼清俊，笑容浅浅，像藏着无尽温柔，又藏着你看不懂的幽深。他主动开口搭话，目光牢牢落在你身上，一刻也没有移开。你心头微颤，不知该如何回应这份突如其来的靠近。",
+                title: "序章 · 暮色初遇",
+                text: "傍晚微风拂过校园林荫道，夕阳染红半边天际，你独自漫步散心。前方少年静静靠在梧桐树下，侧脸清冷又温柔，目光自你出现起，便死死锁定在你身上，不曾挪开半分。他缓步朝你走来，步伐缓慢带着极强的压迫感，温柔皮囊之下，藏着早已根深蒂固的偏执心动。周遭气氛渐渐安静，整片天地仿佛只剩下你们二人。",
                 mood: "mood-normal",
-                triggerEffect: null,
                 choices: [
-                    { text: "轻声回应，顺其自然交换联系方式", next: "accept", effect: "red" },
-                    { text: "略显羞涩，委婉避开他的搭话", next: "decline", effect: "black" }
+                    { text: "主动停下脚步，轻声回应他", next: "meetTalk1", effect: "red", customText:"终于等到你走向我" },
+                    { text: "微微低头，害羞不敢对视", next: "meetTalk2", effect: "red", customText:"害羞的样子真可爱" },
+                    { text: "故作冷淡，径直侧身走过", next: "meetCold", effect: "black", customText:"为何刻意无视我" },
+                    { text: "好奇打量，主动上前搭话", next: "meetChat", effect: "red", customText:"主动靠近我最欢喜" }
                 ]
             },
-            accept: {
-                title: "第一章 · 温柔的圈套",
-                text: "你笑着回应了他，两人顺其自然加了联系方式。从那天起，他早安晚安从不缺席，记住你所有喜好，清楚你下课时间、常去的奶茶店、甚至你随口一提的小习惯。所有人都羡慕你被这样温柔的学长偏爱，可只有暗处的细节在悄悄暴露——他翻看你社交主页的每条动态，默默记下你身边每一个异性，眼底藏着不易察觉的占有欲，像在慢慢圈住属于自己的猎物。",
+            meetTalk1: {
+                title: "初遇交谈 · 温柔试探",
+                text: "你停下脚步轻声回应，少年眼底瞬间漾开浓郁笑意，语气轻柔无比，细细询问你的日常喜好、作息行程，看似随意闲聊，实则默默把你所有信息全部牢记在心。晚风轻轻吹动他的衣角，距离渐渐拉近，你能清晰闻到他身上清冷干净的气息，气氛暧昧又静谧，他的目光温柔缱绻，满满都是藏不住的爱意。",
+                mood: "mood-love",
+                choices: [
+                    { text: "如实诉说自己日常喜好", next: "knowMore", effect: "red", customText:"我会全部牢牢记住" },
+                    { text: "简单敷衍回答，不愿多说", next: "perfunctory", effect: "black", customText:"为何不愿与我多说" },
+                    { text: "反问他的喜好，拉近距离", next: "mutualTalk", effect: "red", customText:"愿意了解我真好" },
+                    { text: "借口有事，准备先行离开", next: "wantLeave", effect: "black", customText:"刚见面就要离开吗" }
+                ]
+            },
+            meetTalk2: {
+                title: "腼腆相望 · 心生悸动",
+                text: "你羞涩低头不敢与他对视，少年见你这般模样，心头爱意愈发浓烈，放缓语气轻声安抚你不必紧张。他一步步慢慢靠近，始终保持礼貌距离，却依旧让你心跳急速飙升。他静静注视着你的眉眼，眼神痴迷又专注，仿佛世间所有美好，都不及你半分模样。",
+                mood: "mood-love",
+                choices: [
+                    { text: "慢慢抬头，直视他的双眼", next: "eyeLove", effect: "red", customText:"你的眼眸太过动人" },
+                    { text: "依旧低头，沉默不言不语", next: "silentShy", effect: "red", customText:"安静的你格外迷人" },
+                    { text: "小声开口，简单回应几句", next: "softReply", effect: "red", customText:"你的声音格外好听" },
+                    { text: "慌张转身，想要快步逃走", next: "flusterRun", effect: "black", customText:"不要慌张逃离我" }
+                ]
+            },
+            meetCold: {
+                title: "刻意疏离 · 暗生执念",
+                text: "你故作冷淡侧身走过，无视他的存在。少年脸上的温柔笑意瞬间消散，周身气温骤然下降，阴冷气息缓缓蔓延。他伫立原地静静望着你的背影，眼底偏执情绪不断翻涌，原本浅浅的好感，彻底转变为势在必得的占有欲。越是得不到回应，他便越是下定决心，一定要将你牢牢攥在手心。",
+                mood: "mood-nervous",
+                choices: [
+                    { text: "走后暗自回头悄悄观望", next: "lookBack", effect: "red", customText:"你终究还是在意我" },
+                    { text: "全程无视，头也不回离开", next: "ignoreAll", effect: "black", customText:"我一定会让你注意我" },
+                    { text: "内心不安，步伐渐渐放慢", next: "uneasySlow", effect: "black", customText:"你已经开始心慌了对吗" }
+                ]
+            },
+            meetChat: {
+                title: "主动搭话 · 情愫升温",
+                text: "你鼓起勇气主动上前搭话，少年明显一愣，随即露出极为欢喜的神情，热情回应你的每一句话。两人越聊越是投机，从日常趣事聊到内心想法，相处氛围轻松又甜蜜。夕阳渐渐落下，夜色慢慢降临，他看向你的眼神，早已盛满再也藏不住的深情。",
+                mood: "mood-love",
+                choices: [
+                    { text: "相约下次一同散步闲聊", next: "makeAnAppointment", effect: "red", customText:"我无比期待下次相见" },
+                    { text: "聊完之后礼貌道别分开", next: "politePart", effect: "black", customText:"还想再多陪你一会" },
+                    { text: "顺势询问他是否单身", next: "askSingle", effect: "red", customText:"我的心早已属于你" },
+                    { text: "提议一起去街边散步吹风", next: "walkTogether", effect: "red", customText:"能与你同行万分幸福" }
+                ]
+            },
+            knowMore: {
+                title: "熟记喜好 · 暗中筹备",
+                text: "你坦然说出自己所有喜好与习惯，少年一字一句全部铭记于心，默默在心底规划往后如何贴近你的生活。往后日子里，你会频繁遇见贴合你喜好的事物，偶遇的巧合越来越多，你渐渐察觉，这份相遇从来都不是偶然，而是他蓄谋已久的靠近。",
                 mood: "mood-normal",
-                triggerEffect: null,
                 choices: [
-                    { text: "被温柔打动，答应他的告白", next: "together", effect: "red" },
-                    { text: "警惕发展太快，想再慢慢了解", next: "slow", effect: null },
-                    { text: "只想维持普通朋友界限", next: "friendZone", effect: "black" }
+                    { text: "察觉巧合过多心生疑惑", next: "doubtIntent", effect: "black", customText:"就算察觉也躲不开我" },
+                    { text: "只当皆是缘分坦然接受", next: "believeFate", effect: "red", customText:"缘分注定你属于我" },
+                    { text: "刻意改变喜好避开他", next: "changeLike", effect: "black", customText:"无论如何我都能找到你" }
                 ]
             },
-            decline: {
-                title: "第一章 · 躲避后的窥视",
-                text: "你羞涩婉拒了他的搭话，转身快步离开图书馆。你没有看见，身后少年脸上的温柔笑意瞬间敛去，眼神骤然变冷，牢牢锁住你的背影。从这天开始，一种被人暗中注视的感觉如影随形。路上总有巧合的偶遇，书包里莫名出现带着字迹的纸条，上面只有一句冰冷的低语：别想躲开我。空气渐渐变得压抑，你开始莫名心慌。",
-                mood: "mood-nervous",
-                triggerEffect: "black",
+            eyeLove: {
+                title: "目光相融 · 心动沦陷",
+                text: "你鼓起勇气抬头与他四目相对，深邃眼眸两两相撞，一瞬间空气仿佛静止。少年眼中满是浓烈深情，直白诉说着满心欢喜，温热气息扑面而来，暧昧氛围达到顶峰，此刻无声胜有声，彼此心中都已然泛起别样情愫。",
+                mood: "mood-love",
                 choices: [
-                    { text: "心生不安，向老师反映被跟踪感", next: "teacher", effect: "black" },
-                    { text: "害怕惹事，只能刻意绕路躲避", next: "hide", effect: "black" },
-                    { text: "鼓起勇气，当面质问他为何紧盯自己", next: "confront", effect: "red" }
+                    { text: "被眼神打动，内心彻底心动", next: "heartFall", effect: "red", customText:"沦陷在我的爱意之中吧" },
+                    { text: "慌乱移开视线脸颊发烫", next: "shyAwayEye", effect: "red", customText:"脸红的样子太可爱" },
+                    { text: "镇定自若，依旧平静对视", next: "calmStare", effect: "red", customText:"这般沉稳更让我着迷" }
                 ]
             },
-            together: {
-                title: "第二章 · 恋人的枷锁",
-                text: "你答应和他在一起，起初是被无微不至的温柔包裹。可恋爱没多久，他的控制欲开始肆无忌惮爆发：不准你和异性多说一句话，不准独自外出，手机聊天记录要随时给他检查。一旦你稍有反抗，他就会委屈示弱，把所有错都归于你不够在乎他。直到撞见你和异性好友正常聊天，他第一次彻底失控，眼底翻涌着偏执与怒意，温柔外壳碎裂殆尽。",
-                mood: "mood-dark",
-                triggerEffect: "red",
+            makeAnAppointment: {
+                title: "相约再会 · 爱意渐浓",
+                text: "二人定下下次见面之约，分开之时彼此都满心不舍。自此次相遇过后，他准时赴约，次次贴心陪伴，清晨问候、傍晚相伴，无时无刻不占据你的空余时间，一点点侵入你的生活圈子，让你慢慢习惯身边有他的存在。",
+                mood: "mood-love",
                 choices: [
-                    { text: "妥协删好友，迁就他的占有欲", next: "cutFriend", effect: "red" },
-                    { text: "无法接受控制，当场和他争执", next: "fight", effect: "black" },
-                    { text: "表面顺从，私下悄悄和朋友联络", next: "secretContact", effect: "black" }
+                    { text: "渐渐习惯他的贴身陪伴", next: "usedCompany", effect: "red", customText:"习惯我就再也离不开了" },
+                    { text: "觉得陪伴太过密集不适", next: "feelTired", effect: "black", customText:"只想时时刻刻陪着你" },
+                    { text: "满心欢喜期待每一次见面", next: "lookForwardMeet", effect: "red", customText:"你的期待便是我的欢喜" },
+                    { text: "刻意减少赴约推脱见面", next: "refuseDate", effect: "black", customText:"推脱只会让我更加偏执" }
                 ]
             },
-            slow: {
-                title: "第二章 · 拖延换来的紧盯",
-                text: "你表示想再多了解一段时间，他依旧温柔点头，可眼底掠过一丝不易察觉的阴翳。此后他不再给你留白，强行渗入你生活的每一处：上课堵教室、兼职等门口、傍晚跟在你回家的路上。他从不越界过分，却用无处不在的存在感，让你永远逃不开他的视线，慢慢被无形的网困住，连呼吸都觉得受限。",
-                mood: "mood-nervous",
-                triggerEffect: null,
+            heartFall: {
+                title: "心意沉沦 · 正式表白场景",
+                text: "夜色温柔，街边灯火点点，少年将你带到安静无人的河畔，晚风轻柔吹动发丝。他缓缓停下脚步，转过身认真望向你，褪去所有随性温柔，神情无比郑重，迎来全篇核心专属**深情表白交互场景**。他微微握紧你的手腕，语气低沉认真，一字一句诉说积攒许久的满腔爱意，周遭寂静无声，只剩他滚烫真挚的告白话语萦绕耳边。",
+                mood: "mood-love",
                 choices: [
-                    { text: "被执着打动，最终答应交往", next: "together", effect: "red" },
-                    { text: "察觉被监视，刻意冷淡疏远", next: "distance", effect: "black" },
-                    { text: "刻意冷漠敷衍，想让他知难而退", next: "coldShoulder", effect: "black" }
+                    { text: "毫不犹豫点头答应交往", next: "agreeLove", effect: "red", customText:"此生得你足矣，永不分离" },
+                    { text: "内心犹豫，暂时无法确定", next: "hesitateLove", effect: "black", customText:"我会等到你心甘情愿" },
+                    { text: "委婉拒绝，只想维持朋友", next: "refuseConfess", effect: "black", customText:"朋友身份我绝不满足" },
+                    { text: "害羞不语，默认接受心意", next: "silentAgree", effect: "red", customText:"沉默便是最好的答案" }
                 ]
             },
-            friendZone: {
-                title: "第二章 · 朋友只是借口",
-                text: "你只想保持普通朋友距离，他嘴上答应，行动却从未收敛。他以朋友名义干涉你的穿搭、社交、作息，旁人都误以为你们是情侣，他也从不解释，只是含笑看着你无法辩解。你渐渐发现，在他眼里，从来没有「普通朋友」这个选项，只要被他盯上，就注定只能属于他一人。",
-                mood: "mood-dark",
-                triggerEffect: "black",
+            agreeLove: {
+                title: "确定关系 · 偏执宠爱开启",
+                text: "你点头答应与他在一起，少年瞬间将你紧紧拥入怀中，怀抱用力又温暖，仿佛想要将你揉进骨血之中。自此他明目张胆对你极致偏爱，日常事事顺从满足你的心愿，可隐藏在温柔之下的极强占有欲，也渐渐开始显露出来。不准异性靠近、不准单独外出、事事报备行踪，甜蜜之中渐渐带上无形枷锁。",
+                mood: "mood-love",
                 choices: [
-                    { text: "直白摊牌，拒绝被过度干涉", next: "confess", effect: "black" },
-                    { text: "习惯他的照顾，默认暧昧关系", next: "together", effect: "red" },
-                    { text: "刻意减少见面，慢慢抽离距离", next: "distance", effect: "black" }
+                    { text: "享受独一份偏爱全然顺从", next: "obeyAll", effect: "red", customText:"乖乖听话我会更宠爱你" },
+                    { text: "反感束缚想要私人空间", next: "needSpace", effect: "black", customText:"私人空间只会滋生距离" },
+                    { text: "委婉提醒他不要太过管束", next: "remindHim", effect: "black", customText:"管束皆是因为太过爱你" },
+                    { text: "沉浸甜蜜忽略所有隐患", next: "immerseSweet", effect: "red", customText:"只管安心留在我身边就好" }
                 ]
             },
-            teacher: {
-                title: "第三章 · 无人相信的不安",
-                text: "你鼓起勇气把被跟踪、被窥视的感受告诉老师，可他早已提前塑造了温柔懂事的人设。面对老师询问，他言辞恳切，只说是好心关心同学，反倒显得你敏感多想。老师劝慰你别胡思乱想，同学也觉得你太过矫情。一瞬间，你陷入孤立无援，连可以倾诉的人都没有，不安愈发浓重。",
-                mood: "mood-sad",
-                triggerEffect: "black",
-                choices: [
-                    { text: "认清现实风险，选择直接报警", next: "police", effect: "black" },
-                    { text: "害怕被报复，选择沉默隐忍", next: "silent", effect: "black" },
-                    { text: "找信赖好友结伴，互相照应", next: "friendHelp", effect: null }
-                ]
-            },
-            hide: {
-                title: "第三章 · 无处可躲的阴影",
-                text: "你开始刻意绕路、提前出门、避开人少的小路，可无论怎么换路线，总能「偶遇」他。他永远带着温和笑意，仿佛一切都是巧合，可你清楚感受到那刻意的尾随与窥视。夜里躺在床上，总觉得窗外有视线落在身上，失眠、心慌、恐惧，慢慢缠上你的生活。",
-                mood: "mood-nervous",
-                triggerEffect: "black",
-                choices: [
-                    { text: "不再忍耐，当面问清他的目的", next: "confront", effect: "red" },
-                    { text: "身心俱疲，请假回家躲避", next: "escapeHome", effect: "black" },
-                    { text: "躲在学校僻静角落，暂时避人", next: "hidePlace", effect: "black" }
-                ]
-            },
-            cutFriend: {
-                title: "第三章 · 妥协只是开始",
-                text: "你为了安抚他，删掉异性好友联系方式。他瞬间恢复温柔，抱着你柔声夸赞你懂事。可这只是退让的开端，他开始一步步剥夺你的社交：限制同性朋友来往、管控穿衣风格、查看手机每一条消息。你渐渐失去自己的圈子、爱好、自由，生活里只剩下他一人，像被圈养在牢笼里的玩偶。",
-                mood: "mood-dark",
-                triggerEffect: "red",
-                choices: [
-                    { text: "继续妥协退让，避免他发怒", next: "compromise", effect: "red" },
-                    { text: "忍到极限，决绝提出分手", next: "breakup", effect: "black" },
-                    { text: "偷偷恢复联络，小心翼翼隐瞒", next: "secretContact", effect: "black" }
-                ]
-            },
-            fight: {
-                title: "第三章 · 撕破温柔假象",
-                text: "你忍不住和他争吵，控诉他控制欲太强、不给你私人空间。他第一次彻底失控，摔碎桌上水杯，眼底翻涌偏执与戾气，嘶吼着你只能属于他，不许任何人觊觎。发泄过后，他又立刻示弱落泪，哀求你不要离开，用温柔和愧疚捆绑你的情绪，让你愧疚、犹豫、无法彻底抽身。",
-                mood: "mood-mad",
-                triggerEffect: "black",
-                choices: [
-                    { text: "害怕冲突，低头服软妥协", next: "compromise", effect: "red" },
-                    { text: "心冷彻底，坚持分手决裂", next: "breakup", effect: "black" },
-                    { text: "选择冷战，看他是否会收敛", next: "coldWar", effect: "black" }
-                ]
-            },
-            secretContact: {
-                title: "第四章 · 隐瞒被拆穿",
-                text: "你私下偷偷和旧朋友联络，小心翼翼不敢让他发现。可他早已在你手机暗中装了监控，你的每一条消息、每一次聊天都被他尽收眼底。被拆穿那一刻，他笑容冰冷，眼神透着受伤与疯狂，把你锁在房间没收手机，语气低沉：你为什么总要骗我？难道我给你的还不够多吗？",
-                mood: "mood-mad",
-                triggerEffect: "black",
-                choices: [
-                    { text: "示弱哭泣，哀求他原谅", next: "compromise", effect: "red" },
-                    { text: "趁他不备，伺机逃跑", next: "runAway", effect: "black" },
-                    { text: "彻底摊牌，坚定要结束关系", next: "breakup", effect: "black" }
-                ]
-            },
-            coldShoulder: {
-                title: "第四章 · 冷漠只会激化偏执",
-                text: "你刻意冷淡、不回消息、避开见面，想让他主动放弃。可你的疏离非但没有劝退，反而点燃了他的占有欲。他开始堵在你宿舍楼下、家门口，红着眼眶质问你为何刻意躲开，语气带着委屈，又藏着不容拒绝的强势：你越躲，我越不可能放手。",
-                mood: "mood-nervous",
-                triggerEffect: "black",
-                choices: [
-                    { text: "被他偏执震慑，勉强答应交往", next: "together", effect: "red" },
-                    { text: "态度强硬，明确拒绝他的纠缠", next: "refuse", effect: "black" },
-                    { text: "假意缓和，暗中寻找脱身机会", next: "pretendRelax", effect: null }
-                ]
-            },
-            distance: {
-                title: "第四章 · 逃离无效",
-                text: "你刻意疏远、减少回应，试图慢慢淡出他的世界。可他像附骨之疽，你退一步，他进十步。总能精准出现在你必经的每一个地方，温柔言语下是强势的禁锢，让你明白：只要被他盯上，简单的疏远根本没用。",
-                mood: "mood-dark",
-                triggerEffect: "black",
-                choices: [
-                    { text: "被逼无奈，只能答应在一起", next: "together", effect: "red" },
-                    { text: "立场坚定，彻底划清界限", next: "refuse", effect: "black" },
-                    { text: "以忙碌为借口，暂时避开见面", next: "busy", effect: null }
-                ]
-            },
-            confess: {
-                title: "第四章 · 摊牌毫无用处",
-                text: "你认真和他摊牌，不愿被过度掌控、不愿做依附他的存在。他听完只是淡淡一笑，丝毫没有收敛的意思，反而觉得你在意他、在乎他的态度，更加激起他的掌控欲。从这天起，他管束更严、窥视更密，温柔变成困住你的枷锁。",
-                mood: "mood-mad",
-                triggerEffect: "black",
-                choices: [
-                    { text: "彻底失望，拉黑所有联系方式", next: "refuse", effect: "black" },
-                    { text: "无力反抗，只能默默妥协", next: "compromise", effect: "red" },
-                    { text: "求助师长家长，强制介入分开", next: "police", effect: "black" }
-                ]
-            },
-            police: {
-                title: "第五章 · 法律也难约束的偏执",
-                text: "你选择报警，可他没有实质伤害行为，警方只能口头警告。这次警告彻底惹怒了他，温柔面具完全撕碎，眼神冰冷阴郁。他开始暗中威胁你的朋友、家人，用身边人的安稳逼迫你妥协，让你明白他偏执起来，什么事情都做得出来。",
-                mood: "mood-mad",
-                triggerEffect: "black",
-                choices: [
-                    { text: "申请学校庇护，搬入宿舍避嫌", next: "protect", effect: "black" },
-                    { text: "连夜收拾行李，逃离这座城市", next: "escapeCity", effect: "black" },
-                    { text: "假意顺从放松他警惕，暗中取证", next: "pretendRelax", effect: null }
-                ]
-            },
-            silent: {
-                title: "第五章 · 沉默换来变本加厉",
-                text: "你选择沉默隐忍，不敢反抗、不敢求助。你的退让在他眼里变成默认与接受，他愈发肆无忌惮，光明正大接送你、干涉你生活，在外人面前扮演深情追求者，把你困在无形的舆论与视线里，孤立无援，步步沦陷。",
-                mood: "mood-sad",
-                triggerEffect: "black",
-                choices: [
-                    { text: "认命试着接受他的存在", next: "together", effect: "red" },
-                    { text: "悄悄准备转学，彻底远离", next: "transfer", effect: "black" },
-                    { text: "向他好友倾诉，希望有人劝导", next: "tellFriend", effect: null }
-                ]
-            },
-            friendHelp: {
-                title: "第五章 · 朋友也无法依靠",
-                text: "你找来好友结伴同行，想借此避开他的尾随。可他太擅长伪装，在你朋友面前温柔克制，反倒把你塑造成敏感多想的一方。朋友纷纷劝你别太过较真，觉得他只是太过深情。你彻底陷入孤独，连身边人都无法理解你的恐惧。",
-                mood: "mood-sad",
-                triggerEffect: "black",
-                choices: [
-                    { text: "放弃求助，只能独自躲避", next: "hide", effect: "black" },
-                    { text: "不再侥幸，果断报警取证", next: "police", effect: "black" },
-                    { text: "假意和好，悄悄收集他纠缠证据", next: "pretendRelax", effect: null }
-                ]
-            },
-            confront: {
-                title: "第五章 · 质问只会坦诚偏执",
-                text: "你拦住他当面质问为何一直尾随窥视。他没有否认，反而坦然承认喜欢你到无法自控，眼神偏执又认真：我想看着你、守着你，我不能接受你身边有别人。温柔的语气里，是不容挣脱的占有，让你浑身发冷，真切感受到他骨子里的疯狂。",
-                mood: "mood-nervous",
-                triggerEffect: "red",
-                choices: [
-                    { text: "被偏执震慑，不敢再拒绝", next: "together", effect: "red" },
-                    { text: "立场坚定，明确拒绝他", next: "refuse", effect: "black" },
-                    { text: "假装被打动，趁机脱身", next: "pretendRelax", effect: null }
-                ]
-            },
-            escapeHome: {
-                title: "第六章 · 回家也躲不开",
-                text: "你请假回到家中，以为远离学校就能躲开纠缠。可没过几天，他就出现在你家小区楼下，安静伫立，目光望向你家窗户。你瞬间头皮发麻——他早就摸清你的家庭住址、作息行踪，你逃到哪里，他就能找到哪里。",
-                mood: "mood-nervous",
-                triggerEffect: "black",
-                choices: [
-                    { text: "让父母出面驱赶并警告", next: "parents", effect: "black" },
-                    { text: "假意答应他，骗他先行离开", next: "pretend", effect: null },
-                    { text: "和家人商议，连夜搬家远离", next: "escapeCity", effect: "black" }
-                ]
-            },
-            hidePlace: {
-                title: "第六章 · 躲藏毫无意义",
-                text: "你躲进学校僻静的杂物间，以为能暂时避开视线。可没多久，门被轻轻推开，他缓步走入，眼底带着笃定的笑意。他早就猜到你的藏身之处，对你的一举一动了如指掌。狭小的空间里，只有你慌乱的心跳和他步步靠近的身影。",
-                mood: "mood-dark",
-                triggerEffect: "black",
-                choices: [
-                    { text: "无力挣脱，只能任由他带走", next: "together", effect: "red" },
-                    { text: "趁他靠近，拼命冲出去逃跑", next: "runAway", effect: "black" },
-                    { text: "示弱哀求，求他放过自己", next: "beg", effect: "red" }
-                ]
-            },
-            compromise: {
-                title: "第六章 · 沦为专属玩偶",
-                text: "你一次次妥协、退让、迁就，慢慢丢掉自我。社交、爱好、私人空间全部被剥夺，生活围着他转，情绪由他掌控。他对你温柔依旧，却带着牢牢的禁锢，把你养成只依赖他、只属于他的人偶，再也没有逃离的勇气与能力。",
-                mood: "mood-dark",
-                triggerEffect: "red",
-                choices: [
-                    { text: "彻底放弃反抗，接受宿命", next: "endObedient", effect: "red" },
-                    { text: "暗中等待时机，伺机逃离", next: "runAway", effect: "black" },
-                    { text: "故意激怒他，留存施暴证据", next: "provoke", effect: "black" }
-                ]
-            },
-            breakup: {
-                title: "第六章 · 分手触发疯狂",
-                text: "你坚决提出分手，彻底打碎他的掌控幻想。他瞬间褪去所有温柔，眼神阴鸷偏执，把你锁在房间，语气低沉冰冷：分手？你以为你有选择的权利吗？从遇见你的那一刻起，你就注定只能留在我身边，哪也去不了。",
-                mood: "mood-mad",
-                triggerEffect: "black",
-                choices: [
-                    { text: "恐惧之下道歉求和", next: "compromise", effect: "red" },
-                    { text: "寻机反击，砸晕他逃离", next: "escapeRoom", effect: "black" },
-                    { text: "假意服软，暗中等待求救机会", next: "pretendRelax", effect: null }
-                ]
-            },
-            coldWar: {
-                title: "第七章 · 冷战只会加深监视",
-                text: "你选择冷战不理会他，本想让他冷静反思。可他却用更极端的方式回应：暗中监控你手机、跟踪你出行、盘问你每一个接触的人。冷战在他眼里，只是你想要逃离的借口，只会让他看管更严、控制更强。",
-                mood: "mood-dark",
-                triggerEffect: "black",
-                choices: [
-                    { text: "服软和好，不敢再冷战", next: "compromise", effect: "red" },
-                    { text: "心死决绝，坚持分手", next: "breakup", effect: "black" },
-                    { text: "假意缓和，悄悄卸载监控", next: "pretendRelax", effect: null }
-                ]
-            },
-            pretendRelax: {
-                title: "第七章 · 假意顺从暗中布局",
-                text: "你刻意收敛态度，对他温柔平和，让他放下警惕。暗地里悄悄录音、保存聊天记录、拍下他尾随与威胁的证据。你清楚，唯有拿到足够凭证，才能真正摆脱这份偏执的纠缠，逃出他布下的牢笼。",
+            hesitateLove: {
+                title: "犹豫迟疑 · 耐心蛰伏等待",
+                text: "面对深情告白你内心犹豫不决，没有立刻给出答案。少年没有丝毫逼迫，依旧温柔如初默默陪伴在你身旁，收敛所有偏执情绪，用长久陪伴慢慢融化你的内心。可在无人看见的角落，他依旧默默清理所有靠近你的异性，暗中扫清一切阻碍，静静等候你彻底属于他的那一天。",
                 mood: "mood-normal",
-                triggerEffect: null,
                 choices: [
-                    { text: "证据充足，立刻报警求助", next: "police", effect: "black" },
-                    { text: "继续隐忍，收集更多关键证据", next: "collectMore", effect: "black" },
-                    { text: "趁他放松，直接远走他乡", next: "escapeCity", effect: "black" }
+                    { text: "日久生情慢慢接受心意", next: "slowAccept", effect: "red", customText:"我的等待从来不会白费" },
+                    { text: "思虑再三最终选择拒绝", next: "finalRefuse", effect: "black", customText:"拒绝也无法推开我的心意" },
+                    { text: "保持距离继续观察试探", next: "keepDistanceWatch", effect: "black", customText:"无论如何我都不会放手" }
                 ]
             },
-            refuse: {
-                title: "第七章 · 拒绝换来威胁",
-                text: "你态度坚决彻底拒绝他的所有靠近与纠缠。他脸上温柔彻底消失，只剩阴冷偏执：你可以拒绝我，但你逃不掉。此后他开始暗中威胁你的亲友，用身边人的安稳逼迫你妥协，告诉你反抗只会付出更大代价。",
+            refuseConfess: {
+                title: "拒绝告白 · 偏执彻底爆发",
+                text: "你明确拒绝他的深情告白，只想维持普通朋友关系。少年脸上温柔彻底碎裂，眼底翻涌浓郁的阴郁与疯狂，周身气氛冷到极致。长久以来的隐忍与克制尽数崩塌，往日温柔不复存在，取而代之的是势必要将你强行留在身边的极端想法，一场无声的禁锢自此拉开序幕。",
                 mood: "mood-mad",
-                triggerEffect: "black",
                 choices: [
-                    { text: "为保护亲友，被迫妥协接受", next: "together", effect: "red" },
-                    { text: "斩断一切，换城市换手机号消失", next: "escapeCity", effect: "black" },
-                    { text: "联系他家人，曝光他偏执行为", next: "tellFamily", effect: "black" }
+                    { text: "察觉不对劲立刻转身离开", next: "rushAway", effect: "black", customText:"你逃不掉我的掌控范围" },
+                    { text: "心生恐惧主动低头服软", next: "fearSoft", effect: "red", customText:"早点顺从就不会受伤" },
+                    { text: "据理力争坚持自己想法", next: "argueFirm", effect: "black", customText:"你的反抗毫无用处" }
                 ]
             },
-            busy: {
-                title: "第七章 · 忙碌挡不住靠近",
-                text: "你以学业忙碌、兼职繁忙为借口减少见面。可他从不给你疏远的机会，以关心为名送三餐、等下班、守在你必经路口，用无休止的陪伴填满你的生活，让你连独处喘息的空间都没有。",
+            obeyAll: {
+                title: "全然顺从 · 温柔囚笼深陷",
+                text: "你全盘顺从他所有要求，心甘情愿接受他的一切管束与偏爱。他将世间所有温柔宠溺全部给予你，把你照顾得无微不至，衣食住行全部悉心安排妥当。你被困在他亲手打造的温柔牢笼之中，不用面对外界纷扰，安稳沉浸在独属于二人的小世界里，渐渐彻底失去逃离的想法。",
+                mood: "mood-dark",
+                loveEnding:"我倾尽全部温柔只为困住你，你的世界里只需要有我一人便足够，不必接触外人，不必向往自由，留在我怀里，被我一辈子偏爱禁锢，就是我能给你最极致圆满的爱意，生生世世，永不放开你的手。",
+                choices: [{ text: "重新开启全新剧情", next: "restart" }]
+            },
+            needSpace: {
+                title: "渴求自由 · 矛盾冲突爆发",
+                text: "你渴望拥有私人自由空间，不愿被时刻管束束缚，频频与他产生矛盾争执。他内心极度不安，害怕你的自由会让别人趁机闯入你的世界，害怕你渐渐远离自己。争吵过后他总会低声落泪道歉，用脆弱模样博取你的心软，一次次将你的底线不断拉扯消磨。",
                 mood: "mood-nervous",
-                triggerEffect: null,
                 choices: [
-                    { text: "被坚持打动，试着接受他", next: "together", effect: "red" },
-                    { text: "彻底厌烦，直接拉黑断绝", next: "refuse", effect: "black" },
-                    { text: "找好友假扮男友，让他死心", next: "fakeBoyfriend", effect: "black" }
+                    { text: "心软原谅再次选择妥协", next: "softForgive", effect: "red", customText:"原谅我只是太过害怕失去你" },
+                    { text: "心灰意冷决心彻底分开", next: "decideBreak", effect: "black", customText:"想要分开绝无可能" },
+                    { text: "彼此冷静暂时断开联系", next: "calmBreakContact", effect: "black", customText:"断开联系只会让我疯狂" }
                 ]
             },
-            protect: {
-                title: "第八章 · 庇护也挡不住阴影",
-                text: "学校给你安排庇护与陪同，可他总能找到空隙靠近。深夜宿舍楼下的等待、带着诡异气息的礼物、眼神里直白的占有欲，让你精神紧绷、夜夜难安。庇护只能护住人身，却挡不住无处不在的心理恐惧。",
-                mood: "mood-sad",
-                triggerEffect: "black",
-                choices: [
-                    { text: "申请休学，回家静养躲避", next: "escapeHome", effect: "black" },
-                    { text: "联合朋友设局，曝光他所作所为", next: "trap", effect: "black" },
-                    { text: "向法院申请人身保护", next: "police", effect: "black" }
-                ]
-            },
-            escapeCity: {
-                title: "结局 · 无处可逃的宿命",
-                text: "你抛下一切远走他乡，换城市、换号码、换生活轨迹，以为终于挣脱牢笼。可在陌生城市的街头，你再次看见那个熟悉的身影。他依旧带着浅浅笑意，一步步向你走来，轻声低语：我说过，你永远跑不掉的。从相遇那一刻起，你就注定是他一人的专属。",
+            rushAway: {
+                title: "仓皇逃离 · 全网搜寻追捕",
+                text: "你察觉他情绪失控慌忙逃离现场，本以为能够彻底摆脱纠缠。可自此之后，无论你去往校园何处、大街小巷、甚至家中附近，都能轻易撞见他的身影。他摸清了你所有出行路线、社交圈子、亲友住址，全方位无死角将你牢牢锁定，你已然彻底陷入无处可逃的绝境之中。",
                 mood: "mood-mad",
-                triggerEffect: "red",
-                choices: [
-                    { text: "重新开始新的剧情", next: "restart" }
-                ]
+                loveEnding:"从你拒绝我的那一刻开始，我就注定不会放手，世间再大也容不下你的逃离，我会踏遍所有角落寻你，把你带回身边牢牢看管，哪怕困住你的人身，也要彻底占有你的整颗真心，这份偏执爱意，至死方休。",
+                choices: [{ text: "重新开启全新剧情", next: "restart" }]
             },
-            transfer: {
-                title: "结局 · 如影随形",
-                text: "你悄悄转学隐姓埋名，以为能开启全新生活。可踏入新班级的那一刻，你一眼就看见坐在角落的他。他抬眸看向你，笑意温柔又偏执，仿佛早已算好一切。无论你逃到天涯海角，他都能找到你，永远如影随形。",
-                mood: "mood-dark",
-                triggerEffect: "black",
-                choices: [
-                    { text: "重新开始新的剧情", next: "restart" }
-                ]
-            },
-            parents: {
-                title: "结局 · 无声的陨落",
-                text: "父母出面强硬驱赶，甚至报警警告。他暂时消失沉寂，让你以为风波落幕。可在你独自返校的路上，他突然出现，将你带入无人的角落。从此世间再无你的消息，只留下旁人嘴里零星的传闻，而他依旧是众人眼中温柔干净的优秀学长。",
-                mood: "mood-sad",
-                triggerEffect: "black",
-                choices: [
-                    { text: "重新开始新的剧情", next: "restart" }
-                ]
-            },
-            pretend: {
-                title: "结局 · 侥幸逃离",
-                text: "你假意妥协稳住他，待他离开后立刻收拾行囊，连夜远走，切断所有过往联系。从此隐于陌生城市，再也不涉足曾经的圈子。虽留下心理阴影，但你终于挣脱那偏执的牢笼，重获安稳与自由。",
-                mood: "mood-normal",
-                triggerEffect: null,
-                choices: [
-                    { text: "重新开始新的剧情", next: "restart" }
-                ]
-            },
-            beg: {
-                title: "结局 · 卑微的禁锢",
-                text: "你哭泣哀求放过自己，你的脆弱反而让他生出更强的掌控欲。他温柔安抚你，却把你看得更紧，用温柔困住你的身心。从此你只能乖乖待在他身边，做一个听话、懂事、永远无法逃离的专属恋人。",
-                mood: "mood-dark",
-                triggerEffect: "red",
-                choices: [
-                    { text: "重新开始新的剧情", next: "restart" }
-                ]
-            },
-            provoke: {
-                title: "结局 · 取证自保",
-                text: "你刻意激怒他，诱导他情绪失控留下过激言行与施暴痕迹，悄悄完整录下证据。凭借充足凭证，你成功申请人身保护，他也因偏执骚扰与过激行为受到处罚。你终于用理智挣脱束缚，走出这场噩梦。",
-                mood: "mood-normal",
-                triggerEffect: null,
-                choices: [
-                    { text: "重新开始新的剧情", next: "restart" }
-                ]
-            },
-            escapeRoom: {
-                title: "结局 · 勇敢挣脱",
-                text: "你趁他失神奋力反击，逃出封闭的房间，第一时间报警求助。他的偏执与禁锢行为被彻底曝光，受到应有的惩戒。你虽经历惶恐，却凭着勇气挣脱枷锁，重新回归正常生活。",
-                mood: "mood-normal",
-                triggerEffect: null,
-                choices: [
-                    { text: "重新开始新的剧情", next: "restart" }
-                ]
-            },
-            collectMore: {
-                title: "结局 · 计划败露",
-                text: "你打算慢慢收集更多证据，却被他察觉你的心思。他眼底温柔散尽，只剩冰冷失望，把你彻底禁锢在身边，断绝你所有对外联络。从此你再也没有逃离的机会，永远沦为他笼中的私有物。",
+            decideBreak: {
+                title: "决意分手 · 极致偏执禁锢",
+                text: "你下定决心提出分手，彻底斩断二人之间所有情愫。这个决定彻底触碰他最后的底线，往日所有温柔温情全部消散，他不再伪装情绪，直白展现出内心所有极端想法，开始用各种方式限制你的出行、隔绝你的社交，将你慢慢圈禁在只属于他的小小天地之中。",
                 mood: "mood-mad",
-                triggerEffect: "black",
-                choices: [
-                    { text: "重新开始新的剧情", next: "restart" }
-                ]
+                loveEnding:"我可以包容你的所有小脾气，可以倾尽所有对你好，唯独不能接受你的离开。分手二字永远不许说出口，你生来就该依附于我，被我独自占有，哪怕禁锢一生，我也绝不会放你奔向任何人。",
+                choices: [{ text: "重新开启全新剧情", next: "restart" }]
             },
-            tellFamily: {
-                title: "结局 · 无人救赎",
-                text: "你向他家人坦白一切，可家人偏袒包庇，只当你无理取闹。他得知后彻底被激怒，偏执变本加厉，认定你想毁掉他，从此对你的掌控与监视再也没有底线，你彻底陷入无人救赎的绝境。",
+            slowAccept: {
+                title: "日久情深 · 慢慢沦陷归属",
+                text: "在长久贴心陪伴之下，你渐渐放下心中所有顾虑，心甘情愿接受他的心意，慢慢主动靠近他，接纳他所有好与不好。他欣喜万分，愈发珍惜来之不易的感情，收敛大半极端偏执，只将满满的温柔与真心尽数交付于你，二人安稳甜蜜相守相伴。",
+                mood: "mood-love",
+                loveEnding:"慢慢来没关系，我愿意花费数年光阴等候你走进我的心底，只要最后陪在你身边的人是我，所有等待全部值得，往后余生，朝朝暮暮，我都会倾尽一生爱意好好呵护你，不离不弃。",
+                choices: [{ text: "重新开启全新剧情", next: "restart" }]
+            },
+            finalRefuse: {
+                title: "最终拒绝 · 爱意扭曲沉沦",
+                text: "经过长久思考你依旧选择拒绝他的心意，彻底断绝所有相处可能。一次次的真心付出全部落空，他内心爱意彻底扭曲变质，从最初纯粹的喜欢，彻底转变为疯狂的占有执念，哪怕无法光明正大在一起，也要默默守在你身边，阻断所有接近你的异性。",
                 mood: "mood-sad",
-                triggerEffect: "black",
-                choices: [
-                    { text: "重新开始新的剧情", next: "restart" }
-                ]
-            },
-            endObedient: {
-                title: "结局 · 温柔囚笼",
-                text: "你彻底放弃反抗，心甘情愿留在他身边。他给你极致的温柔与宠溺，也给你密不透风的禁锢。你拥有他独一份的偏爱，却永远失去自由与自我，甘愿做他一辈子的专属玩具，困在温柔编织的牢笼里，再也不愿醒来。",
-                mood: "mood-dark",
-                triggerEffect: "red",
-                choices: [
-                    { text: "重新开始新的剧情", next: "restart" }
-                ]
-            },
-            // 新增补充结局与剧情
-            fakeBoyfriend: {
-                title: "第八章 · 虚假男友的代价",
-                text: "你找好友假扮男友，想让他彻底死心。可他看到你们在一起的画面后，非但没有退缩，反而眼神阴鸷，认定你背叛了他。当晚，你的假男友就收到了匿名威胁信息，你也被他堵在巷口，语气冰冷地质问你：为什么要骗我？",
-                mood: "mood-mad",
-                triggerEffect: "black",
-                choices: [
-                    { text: "承认是假的，求他别伤害朋友", next: "compromise", effect: "red" },
-                    { text: "态度强硬，说自己就是喜欢别人", next: "refuse", effect: "black" }
-                ]
-            },
-            trap: {
-                title: "结局 · 两败俱伤",
-                text: "你联合朋友设局，曝光了他的偏执骚扰行为，让他身败名裂。他被学校开除，可你也因这场闹剧受到牵连，被贴上麻烦的标签。你虽摆脱了他，却留下了挥之不去的阴影，再也无法信任他人。",
-                mood: "mood-sad",
-                triggerEffect: "black",
-                choices: [
-                    { text: "重新开始新的剧情", next: "restart" }
-                ]
+                loveEnding:"就算不能光明正大陪在你身边，我也会默默守在你的身后，斩断所有觊觎你的人，不让任何人夺走你的目光，我的爱意不求回应，只求能够一直默默注视着你，此生执念，永不消散。",
+                choices: [{ text: "重新开启全新剧情", next: "restart" }]
             }
         };
 
         let currentScene = "start";
         const bodyBg = document.getElementById("bodyBg");
-        const gameBox = document.getElementById("gameBox");
         const titleDom = document.getElementById("title");
         const textDom = document.getElementById("text");
         const choicesDom = document.getElementById("choices");
 
-        // 开场动画
-        setTimeout(() => {
-            document.getElementById("startLoader").classList.add("fade-out");
-            setTimeout(() => {
-                gameBox.classList.add("show-container");
-                updateScene();
-            }, 800);
-        }, 2500);
-
-        function goToScene(sceneId, effect) {
+        function goToScene(sceneId, effect, customText) {
             if(sceneId === "restart") {
                 currentScene = "start";
-                // 清空文字效果
                 document.getElementById("textOverlay").innerHTML = "";
             } else {
                 currentScene = sceneId;
             }
-            // 触发选项文字效果
-            if(effect) {
-                spawnTextEffect(effect, 5);
-            }
-            // 场景自带的文字效果
-            if(scenes[currentScene].triggerEffect) {
-                setTimeout(() => {
-                    spawnTextEffect(scenes[currentScene].triggerEffect, 3);
-                }, 500);
-            }
-            // 清空渐入状态
-            titleDom.classList.remove("show");
-            textDom.classList.remove("show");
-            choicesDom.classList.remove("show");
-            // 延迟更新 制造情景切换动画感
-            setTimeout(() => {
-                updateScene();
-            }, 600);
+            if(effect) spawnTextEffect(effect,6,customText);
+            updateScene();
         }
 
         function updateScene() {
             const scene = scenes[currentScene];
-            // 切换整体氛围背景
             bodyBg.className = scene.mood;
-
             titleDom.textContent = scene.title;
-            textDom.textContent = scene.text;
-
-            // 清空选项
+            if(scene.loveEnding){
+                textDom.innerHTML = scene.text + `<br><br><span class="love-word">【专属偏执爱意独白】<br>${scene.loveEnding}</span>`;
+            }else{
+                textDom.textContent = scene.text;
+            }
             choicesDom.innerHTML = "";
-
-            scene.choices.forEach(choice => {
+            scene.choices.forEach(choice=>{
                 const btn = document.createElement("button");
-                btn.className = "choice-btn";
-                if(choice.next === "restart") {
-                    btn.classList.add("end-btn");
-                }
+                btn.className = choice.next==="restart"?"choice-btn end-btn":"choice-btn";
                 btn.textContent = choice.text;
-                btn.onclick = () => goToScene(choice.next, choice.effect);
+                btn.onclick = ()=>goToScene(choice.next,choice.effect,choice.customText);
                 choicesDom.appendChild(btn);
-            });
-
-            // 文字逐块渐入
-            setTimeout(()=>titleDom.classList.add("show"),150);
-            setTimeout(()=>textDom.classList.add("show"),350);
-            setTimeout(()=>choicesDom.classList.add("show"),550);
+            })
         }
+        updateScene();
     </script>
 </body>
 </html>
