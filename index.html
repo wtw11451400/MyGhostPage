@@ -19,6 +19,41 @@
             padding: 18px;
             position: relative;
             overflow-x: hidden;
+            transition: background 0.8s ease;
+        }
+        /* 全局氛围光影互动 */
+        body::before{
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, transparent 40%, rgba(255,40,40,0.15));
+            pointer-events: none;
+            z-index: 1;
+            animation: lightBeat 4s infinite ease-in-out;
+        }
+        @keyframes lightBeat{
+            0%,100%{opacity:0.3;}
+            50%{opacity:0.7;}
+        }
+        /* 心跳动态元素 */
+        .heart-beat{
+            position: fixed;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 35px;
+            color: #ff4455;
+            text-shadow: 0 0 15px #ff2233;
+            animation: heartAnim 1.2s infinite;
+            z-index: 5;
+            user-select: none;
+        }
+        @keyframes heartAnim{
+            0%,100%{transform: translateY(-50%) scale(1);}
+            50%{transform: translateY(-50%) scale(1.2);}
         }
         .game-container {
             max-width: 620px;
@@ -31,6 +66,10 @@
             border: 1px solid #5c1515;
             position: relative;
             z-index: 10;
+            transition: all 0.5s ease;
+        }
+        .game-container:hover{
+            box-shadow: 0 0 60px rgba(255,20,20,0.6);
         }
         .scene-title {
             color: #ff6363;
@@ -38,12 +77,19 @@
             margin-bottom: 20px;
             text-align: center;
             text-shadow: 0 0 10px rgba(255,70,70,0.55);
+            animation: titleFlick 3s infinite alternate;
+        }
+        @keyframes titleFlick{
+            from{text-shadow:0 0 10px #ff4444;}
+            to{text-shadow:0 0 20px #ff0000,0 0 30px #ff2222;}
         }
         .scene-text {
             margin-bottom: 32px;
             font-size: 15.5px;
             min-height: 220px;
+            transition: color 0.5s ease;
         }
+        /* 互动选项按钮 */
         .choice-btn {
             display: block;
             width: 100%;
@@ -56,17 +102,40 @@
             cursor: pointer;
             font-size: 14.8px;
             transition: all 0.35s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .choice-btn::after{
+            content: '';
+            position: absolute;
+            left: -100%;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg,transparent,rgba(255,80,80,0.2),transparent);
+            transition: left 0.5s ease;
+        }
+        .choice-btn:hover::after{
+            left: 100%;
+        }
+        .choice-btn:hover {
+            background: #331818;
+            border-color: #ff6666;
+            color: #ffaaaa;
+            letter-spacing: 1px;
         }
         .choice-btn:active {
             background: #401c1c;
             border-color: #ff5555;
             color: #ff8080;
+            transform: scale(0.98);
         }
         .end-btn {
             background: #b82020;
             border-color: #d62e2e;
             color: #fff;
         }
+        /* 情绪背景切换 */
         .mood-normal {background:#120808;}
         .mood-dark {background:#0a0408;}
         .mood-nervous {background:#190808;}
@@ -75,21 +144,28 @@
         .mood-love {background:#160808;}
         .love-word{color:#ff7777;font-weight:bold;margin-top:15px;line-height:2;white-space:pre-wrap;}
 
+        /* 弹窗互动优化 */
         .popup {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.92);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 9999;
             padding: 20px;
+            backdrop-filter: blur(5px);
         }
         .popup.show {
             display: flex;
+            animation: popOpen 0.4s ease;
+        }
+        @keyframes popOpen{
+            from{opacity:0;transform:scale(0.8);}
+            to{opacity:1;transform:scale(1);}
         }
         .popup-box {
             background: #1b0b0b;
@@ -116,10 +192,18 @@
             border-radius: 8px;
             font-size: 16px;
             cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .popup-close:hover{
+            background: #ff2222;
+            box-shadow: 0 0 15px #ff3333;
         }
     </style>
 </head>
 <body id="bodyBg">
+    <!-- 新增心跳互动图标 -->
+    <div class="heart-beat">❤</div>
+
     <div class="popup" id="popup">
         <div class="popup-box">
             <div class="popup-text" id="popupText"></div>
@@ -136,6 +220,15 @@
     <script>
         let currentScene = "start";
         let pendingScene = null;
+        // 新增情绪音效提示
+        const moodTip = {
+            "mood-normal":"气氛平静，姐姐神色淡然",
+            "mood-love":"满心爱意，满眼皆是你",
+            "mood-nervous":"心生不安，执念开始滋生",
+            "mood-mad":"情绪失控，疯狂尽显",
+            "mood-sad":"满心落寞，默默隐忍",
+            "mood-dark":"阴郁笼罩，压抑十足"
+        };
 
         function showPopup(text) {
             const el = document.getElementById("popupText");
@@ -237,7 +330,7 @@
                 ]
             },
 
-            // 5个完美结局
+            // 5个完整结局
             ending1: {
                 title: "结局一：阴翳视奸",
                 text: "你强硬提出分开，执意摆脱她的束缚。她没有疯狂纠缠，只是安静松开手，眼底一片死寂。你以为自己终于逃离了她的掌控，回归正常生活。可你永远不会知道，从你离开她的那一刻起，她便躲在阴暗角落，无声注视你的一切。窗外、街角、路灯阴影里，总有一道视线死死锁住你。她不打扰、不靠近，却永远不会放过你。",
@@ -280,6 +373,8 @@
             document.body.className = s.mood;
             document.getElementById("title").innerText = s.title;
             document.getElementById("text").innerText = s.text;
+            // 控制台弹出当前姐姐情绪状态互动提示
+            console.log("当前状态："+moodTip[s.mood]);
 
             const box = document.getElementById("choices");
             box.innerHTML = "";
